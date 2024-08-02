@@ -96,19 +96,21 @@ class API {
     return response.json();
   }
 
-  async register(username, password, email, role='user', birthdate) {
+  async register(username, password, email, role = 'user', birthdate) {
+    console.log(username);
     const response = await fetch(`${this.baseUrl}/Auth/register`, {
       method: 'POST',
       headers: this.headers,
-      body: JSON.stringify({ username, password, email, role, birthdate }),
+      body: JSON.stringify({ username, password, email, role }),
     });
 
     if (!response.ok) {
-      throw new Error('Failed to register');
+      throw new Error('Failed to register: ' + response.body);
     }
 
-    const data = await response.json();
-    await this.setTokens(data.token, data.refreshToken);
+    this.login(username, password);
+    // const data = await response.json();
+    // await this.setTokens(data.token, data.refreshToken);
   }
 
   async login(username, password) {
