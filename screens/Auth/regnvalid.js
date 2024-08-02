@@ -1,0 +1,186 @@
+import React from 'react';
+import { View, Text, TextInput, StyleSheet, Pressable, Alert, ScrollView } from 'react-native';
+import Header from '../../components/common/header';
+import globalStyles from '../Other/styles';
+import API from '../../.expo/services/api';
+import { Formik } from 'formik';
+import * as Yup from 'yup';
+
+const RegistrationScreen = () => {
+
+    const validationSchema = Yup.object().shape({
+        code: Yup.string().required('Будь ласка, введіть код'),
+        firstName: Yup.string().required('Будь ласка, введіть ім\'я'),
+        lastName: Yup.string().required('Будь ласка, введіть фамилію'),
+        password: Yup.string().min(8, 'Пароль повинен мати не меньше 8 символів').required('Будь ласка, введіть пароль'),
+        birthDate: Yup.string().matches(/^\d{4}-\d{2}-\d{2}$/, 'Дата народження повинна бути в форматі РРРР-ММ-ДД')
+          .required('Будь ласка, введіть дату народження'),
+      });
+
+  const handleRegister = async (values) => {
+    // Логика регистрации пользователя
+      console.log('Регистрация', values);
+      try {
+        await API.register(username, password, );
+        //navigation.navigate('Home');
+          console.log("Login OK");
+                    
+                
+          navigation.navigate('Profile');
+      } catch (err) {
+          console.log(`login error: ${err}`);
+          setError('Login failed');
+      }
+      finally {
+        setLoading(false);
+      }
+
+    Alert.alert('Прийнято', 'Ви зареєструвалися!');
+  };
+
+  return (
+    <Formik
+      initialValues={{code: '', firstName: '', lastName: '', password: '', birthDate: '',  }}
+      validationSchema={validationSchema}
+      onSubmit={handleRegister}
+    >
+      {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
+      <View style={styles.container}>
+        <Header onlyLOGO={true} />
+        <ScrollView>
+        <View style={styles.body}>
+          <Text style={[globalStyles.defaultText, styles.header]}>Тепер давай зареєструємо тебе у ...</Text>
+          <Text style={[globalStyles.defaultText, styles.subHeader]}>Ми надіслали код на адресу <Text style={styles.link}>Змінити</Text></Text>
+          <TextInput
+            style={[globalStyles.defaultText, styles.input]}
+            placeholder="Код*"
+            onChangeText={handleChange('code')}
+            onBlur={handleBlur('code')}
+            value={values.code}
+          />
+          {touched.code && errors.code ? (
+            <Text style={[globalStyles.defaultText, styles.errorText]}>{errors.code}</Text>
+          ) : null}
+          <TextInput
+            style={[globalStyles.defaultText, styles.input]}
+            placeholder="Ім'я*"
+            onChangeText={handleChange('firstName')}
+            onBlur={handleBlur('firstName')}
+            value={values.firstName}
+          />
+          {touched.firstName && errors.firstName ? (
+            <Text style={[globalStyles.defaultText, styles.errorText]}>{errors.firstName}</Text>
+          ) : null}
+          <TextInput
+            style={[globalStyles.defaultText, styles.input]}
+            placeholder="Прізвище*"
+            onChangeText={handleChange('lastName')}
+            onBlur={handleBlur('lastName')}
+            value={values.lastName}
+          />
+          {touched.lastName && errors.lastName ? (
+            <Text style={[globalStyles.defaultText, styles.errorText]}>{errors.lastName}</Text>
+          ) : null}
+          <TextInput
+            style={[globalStyles.defaultText, styles.input]}
+            placeholder="Пароль*"
+            secureTextEntry
+            onChangeText={handleChange('password')}
+            onBlur={handleBlur('password')}
+            value={values.password}
+          />
+          {touched.password && errors.password ? (
+            <Text style={[globalStyles.defaultText, styles.errorText]}>{errors.password}</Text>
+          ) : null}
+          {/* <Text style={styles.passwordHint}>Мінімум символів: 8</Text> */}
+          <TextInput
+            style={[globalStyles.defaultText, styles.input]}
+            placeholder="Дата народження* (РРРР-ММ-ДД)"
+            onChangeText={handleChange('birthDate')}
+            onBlur={handleBlur('birthDate')}
+            value={values.birthDate}
+          />
+          {touched.birthDate && errors.birthDate ? (
+            <Text style={[globalStyles.defaultText, styles.errorText]}>{errors.birthDate}</Text>
+          ) : null}
+          <Pressable style={styles.button} onPress={handleSubmit}>
+            <Text style={[globalStyles.defaultText, styles.buttonText]}>Створити аккаунт</Text>
+          </Pressable>
+        </View>
+        </ScrollView>
+      </View>
+      )}
+    </Formik>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    },
+  body: {
+    flex: 1,
+    padding: 20,
+    alignItems: 'stretch',
+    justifyContent: 'center',
+    },
+  header: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  subHeader: {
+    fontSize: 14,
+    color: '#777',
+    marginBottom: 10,
+  },
+  link: {
+    color: '#0000FF', // Синий цвет для ссылки
+  },
+  input: {
+    height: 40,
+    borderColor: '#000',
+    borderWidth: 1,
+    borderRadius: 5,
+    marginBottom: 10,
+    paddingHorizontal: 10,
+  },
+  errorText: {
+    fontSize: 12,
+    color: 'red',
+    marginBottom: 10,
+  },
+  passwordHint: {
+    fontSize: 12,
+    color: '#777',
+    marginBottom: 10,
+  },
+  button: {
+    marginTop: 30,
+    backgroundColor: '#FFC700',
+    // alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 20,
+    paddingVertical: 10,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 3,
+      height: 3,
+    },
+    shadowOpacity: 0.4,
+    shadowRadius: 5,
+    elevation: 5,
+    width: 150,
+    width: '60%',
+    alignSelf: 'center',
+  },
+  buttonText: {
+    color: '#FFF',
+    fontSize: 16,
+  },
+});
+
+export default RegistrationScreen;
