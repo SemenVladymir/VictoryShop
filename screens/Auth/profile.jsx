@@ -5,12 +5,15 @@ import globalStyles from '../Other/styles';
 import Header from '../../components/common/header';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
+import { Camera } from 'expo-camera';
 
 const Profile = () => {
   const [imageUri, setImageUri] = useState('../../assets/images/Profilephoto.png');
   const [savedImageUri, setSavedImageUri] = useState(null);
   const [error, setError] = useState('');
 
+  const [hasCameraPermission, setHasCameraPermission] = useState(null);
+  const [camera, setCamera] = useState(null);
 
   const showImagePickerOptions = () => {
     Alert.alert("Екран вибора фото для профілю", "Виберіть один з вариантів:", [
@@ -81,11 +84,16 @@ const Profile = () => {
 
   const openCamera = async () => {
     // Запрашиваем разрешения на использование камеры
-    const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== 'granted') {
-      alert('Sorry, we need camera permissions to make this work!');
-      return;
-    }
+    const CameraStatus = await Camera.requestCameraPermissionsAsync();
+    setHasCameraPermission(CameraStatus.status === 'granted');
+
+
+
+    // const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    // if (status !== 'granted') {
+    //   alert('Sorry, we need camera permissions to make this work!');
+    //   return;
+    // }
 
     // Открываем камеру для создания фото
     let result = await ImagePicker.launchCameraAsync({

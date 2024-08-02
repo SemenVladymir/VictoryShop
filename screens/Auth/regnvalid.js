@@ -6,8 +6,9 @@ import API from '../../services/api';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { UserContext } from '../../store/UserContext';
+import { logAsyncStorage } from '../../store/AsyncStorageUtil';
 
-const RegistrationScreen = () => {
+const RegistrationScreen = ({navigation}) => {
 
     const validationSchema = Yup.object().shape({
         username: Yup.string().required('Будь ласка, введіть логін'),
@@ -26,7 +27,7 @@ const RegistrationScreen = () => {
         //navigation.navigate('Home');
           console.log("Registration OK");
                     
-                
+               
           navigation.navigate('Profile');
       } catch (err) {
           console.log(`login error: ${err}`);
