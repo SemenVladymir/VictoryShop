@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Pressable } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Pressable, Image } from 'react-native';
 import { Icon } from'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
 import globalStyles from '../Other/styles';
@@ -22,9 +22,12 @@ const navigation = useNavigation();
 
   return (
     <View style={styles.container}>
-        <Header onlyLOGO={true} />
+      <Header onlyLOGO={false} />
+      <View style={styles.title}>
+        <Text style={[globalStyles.boldText, styles.titletext]}>Пошук</Text>
+      </View>
         <View style={styles.body}>
-            <Text style={[globalStyles.defaultText, styles.title]}>Пошук</Text>
+            {/* <Text style={[globalStyles.defaultText, styles.title]}>Пошук</Text> */}
               <View style={styles.searchContainer}>
               {!isFocused && !searchQuery && <Icon name="search" size={20} style={styles.icon} />}
                 <TextInput
@@ -35,13 +38,18 @@ const navigation = useNavigation();
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}
                 />
-            </View>
+        </View>
+        
+        <Image source={require('../../assets/images/sports.png')} style={styles.discountImage}/>
+        
+          <View style={styles.buttons}>
             <Pressable style={[styles.buttonShadow, styles.buttonFind]} onPress={handleSearch}>
                 <Text style={[globalStyles.defaultText, styles.buttonText]}>Знайти</Text>
             </Pressable>
             <Pressable style={[styles.buttonShadow, styles.buttonHome]} onPress={handleHome}>
                 <Text style={[globalStyles.defaultText, styles.buttonTextHome]}>Головна</Text>
             </Pressable>
+          </View>
         </View>
     </View>
   );
@@ -60,11 +68,17 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
         backgroundColor: '#FFFFFF',
       },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginVertical: 20,
-    },
+      title: {
+        // flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginVertical: 15,
+        // backgroundColor: '#FFC700',
+      },
+      titletext: {
+      fontSize: 22,
+      // fontWeight: 700,
+      },
     icon: {
         marginLeft: 5,
       },
@@ -84,6 +98,12 @@ const styles = StyleSheet.create({
         height: 40,
         //marginLeft: 5,
         fontSize: 16,
+  },
+  buttons: {
+    flex: 1,
+    marginTop: 50,
+    width: '100%',
+    alignItems: 'center',
     },
     buttonFind: {
         backgroundColor: '#FFC700',

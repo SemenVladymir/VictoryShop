@@ -1,22 +1,22 @@
 import React from 'react';
 import { View, Text, FlatList, StyleSheet, Image, SafeAreaView, Pressable } from 'react-native';
 import Header from '../../components/common/header';
-import globalStyles from '../../screens/Other/styles';
+import globalStyles from '../Other/styles';
 import { useNavigation } from '@react-navigation/native';
 
 const favorites = [
   {
     id: '1',
     name: 'ZERØGRAND Running Shoes',
-    price: '7 200 грн.',
+    price: '7 200',
     image: require('../../assets/images/ProductImage.png'), // Replace with your image path
     cathegory: 'для чоловіків',
-    discount: '20%',
+    discount: 20,
   },
   {
     id: '2',
     name: 'Футболка Puma Essentials+',
-    price: '990 грн.',
+    price: '990',
     image: require('../../assets/images/ProductImage.png'), // Replace with your image path
     cathegory: 'для чоловіків',
     discount: null,
@@ -24,43 +24,43 @@ const favorites = [
   {
     id: '3',
     name: 'Спортивний костюм Puma Poly Suit',
-    price: '2 890 грн.',
+    price: '2 890',
     image: require('../../assets/images/ProductImage1.png'), // Replace with your image path
     cathegory: 'для жінок',
-    discount: '20%',
+    discount: null,
   },
   {
     id: '4',
     name: 'Худі 4F Sweatshirt M694',
-    price: '2 099 грн.',
+    price: '2 099',
     image: require('../../assets/images/ProductImage1.png'), // Replace with your image path
     cathegory: 'для чоловіків',
-    discount: null,
+    discount: 20,
   },
-  {
-    id: '5',
-    name: 'ZERØGRAND Running Shoes',
-    price: '7 200 грн.',
-    image: require('../../assets/images/ProductImage.png'), // Replace with your image path
-    cathegory: 'для чоловіків',
-    discount: '20%',
-  },
-  {
-    id: '6',
-    name: 'Худі 4F Sweatshirt M694',
-    price: '2 099 грн.',
-    image: require('../../assets/images/ProductImage1.png'), // Replace with your image path
-    cathegory: 'для чоловіків',
-    discount: null,
-  },
-  {
-    id: '7',
-    name: 'Худі 4F Sweatshirt M694',
-    price: '2 099 грн.',
-    image: require('../../assets/images/ProductImage1.png'), // Replace with your image path
-    cathegory: 'для чоловіків',
-    discount: null,
-  },
+  // {
+  //   id: '5',
+  //   name: 'ZERØGRAND Running Shoes',
+  //   price: '7 200',
+  //   image: require('../../assets/images/ProductImage.png'), // Replace with your image path
+  //   cathegory: 'для чоловіків',
+  //   discount: null,
+  // },
+  // {
+  //   id: '6',
+  //   name: 'Худі 4F Sweatshirt M694',
+  //   price: '2 099',
+  //   image: require('../../assets/images/ProductImage1.png'), // Replace with your image path
+  //   cathegory: 'для чоловіків',
+  //   discount: null,
+  // },
+  // {
+  //   id: '7',
+  //   name: 'Худі 4F Sweatshirt M694',
+  //   price: '2 099',
+  //   image: require('../../assets/images/ProductImage1.png'), // Replace with your image path
+  //   cathegory: 'для чоловіків',
+  //   discount: 20,
+  // },
 ];
 
 export default function FavoritesScreen() {
@@ -75,12 +75,12 @@ export default function FavoritesScreen() {
       </View>
 
       <View style={styles.info}>
-        <Text style={[globalStyles.defaultText, styles.name]}>{item.name}</Text>
+        <Text style={[globalStyles.boldText, styles.name]}>{item.name}</Text>
         <Text style={[globalStyles.defaultText, styles.cathegory]}>{item.cathegory}</Text>
         {!item.discount ?
-          <Text style={[globalStyles.defaultText, styles.price]} >{item.price}</Text>
+          <Text style={[globalStyles.boldText, styles.price]} >{item.price} грн.</Text>
           :
-          <Text style={[globalStyles.defaultText, styles.priceDiscount]} >{item.price}</Text>
+          <Text style={[globalStyles.boldText, styles.priceDiscount]} >{item.price} грн.</Text>
         }
       </View>
         <View style={styles.favoriteIcon}>
@@ -92,15 +92,29 @@ export default function FavoritesScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <Header />
+      {favorites.length? <>
       <View style={styles.title}>
-        <Text style={[globalStyles.defaultText, styles.titletext]}>Обрані товари</Text>
+        <Text style={[globalStyles.boldText, styles.titletext]}>Обрані товари</Text>
       </View>
-    <FlatList
-      data={favorites}
-      renderItem={renderItem}
-      keyExtractor={item => item.id}
-      />
-      </SafeAreaView>
+      <View style={styles.container}>
+        <FlatList
+          data={favorites}
+          renderItem={renderItem}
+          keyExtractor={item => item.id}
+        />
+        </View>
+
+      </> : <>
+          
+      <View style={styles.empty}>
+        <Text style={[globalStyles.boldText, styles.emptyText1]}>Обрані</Text>
+        <Text style={[globalStyles.defaultText, styles.emptyText2]}>У вас немає обраних речей!</Text>
+        {/* <Pressable style={styles.buySelectedButton} onPress={handleCatalog}>
+          <Text style={[globalStyles.defaultText, styles.buttonText]}>За покупками</Text>
+        </Pressable> */}
+      </View>
+      </>}
+    </SafeAreaView>
   );
 }
 
@@ -115,14 +129,26 @@ const styles = StyleSheet.create({
     marginHorizontal: 15,
   },
   title: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: 40,
+    marginVertical: 15,
+  },
+  empty: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyText1: {
+    fontSize: 20,
+    marginBottom: 15,
+  },
+  emptyText2: {
+    fontSize: 16,
+    marginBottom: 20,
   },
   titletext: {
-    fontSize: 20,
-    fontWeight: 700,
+  fontSize: 22,
   },
   item: {
     flexDirection: 'row',
@@ -154,7 +180,6 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 16,
-    fontWeight: 700,
     textAlign: 'left',
     flexWrap: 'wrap',
   },
@@ -165,12 +190,10 @@ const styles = StyleSheet.create({
   },
   price: {
     fontSize: 16,
-    fontWeight: 700,
     color: '#000',
   },
   priceDiscount: {
-    fontSize: 14,
-    fontWeight: 700,
+    fontSize: 16,
     color: '#007BFF',
   },
   favoriteImage: {

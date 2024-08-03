@@ -12,9 +12,9 @@ const FontProvider = ({ children }) => {
     const loadFonts = async () => {
       await Font.loadAsync({
         'Jura-Regular': require('../assets/fonts/Jura-Regular.ttf'),
-        // 'Jura-Bold': require('../assets/fonts/Jura-Bold.ttf'),
-        // 'Inter-Bold': require('../assets/fonts/Inter-Bold.ttf'),
-        // 'Inter-Regular': require('../assets/fonts/Inter-Regular.ttf'),
+        'Jura-Bold': require('../assets/fonts/Jura-Bold.ttf'),
+        'Inter-Bold': require('../assets/fonts/Inter-Bold.ttf'),
+        'Inter-Regular': require('../assets/fonts/Inter-Regular.ttf'),
       });
       setFontsLoaded(true);
     };

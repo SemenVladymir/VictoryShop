@@ -14,7 +14,7 @@ const Main = () => {
       <Header cartCount={2} onlyLOGO={false}/>
       <View style={styles.body}>
           <Image source={require('../../assets/images/img2.png')} style={styles.image} />
-        <Text style={[globalStyles.defaultText, styles.bodyText1]}>{`Твоя перемога ближче,\n ніж здається!`}</Text>
+        <Text style={[globalStyles.boldText, styles.bodyText1]}>{`Твоя перемога ближче,\n ніж здається!`}</Text>
         <Text style={[globalStyles.defaultText, styles.bodyText2]}>{`Знижка до 70%\n на весь асортимент спортивних товарів!`}</Text>
         
         <Pressable style={styles.button} onPress={() => navigation.navigate('Profile')}>
@@ -47,7 +47,6 @@ const styles = StyleSheet.create({
   bodyText1: {
     textAlign: 'center',
     fontSize: 20,
-    fontWeight: 700,
   },
   bodyText2: {
     marginTop: 10,

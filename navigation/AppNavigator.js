@@ -77,7 +77,7 @@ export default function AppNavigator() {
         <FontProvider>
           <AppContent />
         </FontProvider>
-      </ProductProvider>
-    </UserProvider>
+       </ProductProvider>
+     </UserProvider>
   );
 }

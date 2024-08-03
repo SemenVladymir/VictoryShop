@@ -52,10 +52,12 @@ const Profile = () => {
     });
 
     if (!result.canceled) {
-      //setImageUri(result.assets[0].uri);
-      setImageUri(result.uri);
-      saveImageToLocalDirectory(result.uri);
-      console.log(imageUri);
+      console.log(result.assets[0].uri);
+      setImageUri(result.assets[0].uri);
+      saveImageToLocalDirectory(result.assets[0].uri);
+      // setImageUri(result.uri);
+      // saveImageToLocalDirectory(result.uri);
+      // console.log(imageUri);
     }
   };
 
