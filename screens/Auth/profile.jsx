@@ -7,7 +7,7 @@ import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import { Camera } from 'expo-camera';
 
-const Profile = () => {
+const Profile = ({navigation}) => {
   const [imageUri, setImageUri] = useState('../../assets/images/Profilephoto.png');
   const [savedImageUri, setSavedImageUri] = useState(null);
   const [error, setError] = useState('');
@@ -46,7 +46,7 @@ const Profile = () => {
     // Открываем галерею для выбора изображения
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
+      // allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
     });
@@ -65,7 +65,7 @@ const Profile = () => {
     try {
       const fileName = 'Profilephoto.png'; // Название файла, под которым он будет сохранен
       const directory = FileSystem.documentDirectory + 'assets/images/';
-
+      console.log("Directory is - "+directory);
       // Убедитесь, что директория существует, иначе создайте ее
       const dirInfo = await FileSystem.getInfoAsync(directory);
       if (!dirInfo.exists) {
@@ -99,7 +99,7 @@ const Profile = () => {
 
     // Открываем камеру для создания фото
     let result = await ImagePicker.launchCameraAsync({
-      allowsEditing: true,
+      // allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
     });
@@ -117,7 +117,7 @@ const Profile = () => {
       <ScrollView style={styles.container}>
       <View style={styles.profileContainer}>
         <Pressable onPress={showImagePickerOptions}>
-          <Image source={require('../../assets/images/Profilephoto.png')} style={styles.profileImage} />
+            <Image source={{ uri: imageUri }} style={styles.profileImage} />
           <Text style={[globalStyles.defaultText, styles.changePhotoText]}>Змінити фото</Text>
         </Pressable>
 
@@ -146,7 +146,7 @@ const Profile = () => {
             <Icon name="edit" size={20} color="#000" backgroundColor='#F5F5F5'/>
           </View>
         </View>
-        <Pressable style={styles.button}>
+        <Pressable style={styles.button} onPress={() => navigation.navigate('Home')}>
           <Text style={[globalStyles.defaultText, styles.buttonText]}>Зберегти</Text>
         </Pressable>
       </View>
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
     //fontFamily: 'Jura',
     fontSize: 16,
-    fontWeight: '700',
+    // fontWeight: '700',
     height: 50,
     backgroundColor: '#F5F5F5',
   },

@@ -24,7 +24,7 @@ export default function ProductPage(...props) {
         </View> */}
 
         <Image
-          source={{ uri: '../../assets/images/ProductImage.png' }}
+          source={{ uri: 'https://megasport.ua/api/s3/images/megasport-dev/products/3555570144/66323e8f8b981-68e7b68.jpeg' }}
           style={styles.productImage}
         />
               
@@ -109,8 +109,8 @@ const styles = StyleSheet.create({
   },
   productImage: {
     width: '90%',
-    height: 'auto',
-    //resizeMode: 'contain',
+    height: 180,
+    resizeMode: 'contain',
     },
     discountImage: {
         width: 50,

@@ -5,10 +5,10 @@ import { useNavigation } from '@react-navigation/native';
 import globalStyles from '../Other/styles';
 import Header from '../../components/common/header';
 
-const SearchScreen = () => {
+const SearchScreen = ({ navigation }) => {
 const [searchQuery, setSearchQuery] = useState('');
 const [isFocused, setIsFocused] = useState(false);
-const navigation = useNavigation();
+// const navigation = useNavigation();
 
   const handleSearch = () => {
     // Implement the search functionality here

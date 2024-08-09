@@ -4,8 +4,8 @@ import globalStyles from '../Other/styles';
 import { useNavigation } from '@react-navigation/native';
 import Header from '../../components/common/header';
 
-const EnterNRegistr = () => {
-  const navigation = useNavigation();
+const EnterNRegistr = ({navigation}) => {
+  // const navigation = useNavigation();
 
   return (
     <View style={styles.container}>

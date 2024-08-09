@@ -1,14 +1,16 @@
 import 'react-native-gesture-handler';
 import React, { useContext } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 
 import { FontProvider, FontContext } from '../contexts/FontContext';
 import { UserProvider } from '../store/UserContext';
 import { ProductProvider } from '../store/ProductContext';
+import { AuthContext, AuthProvider } from '../store/AuthContext';
 
 import CustomDrawerContent from '../components/common/CustomDrawerContent'
+import BackHandlerWrapper from '../components/common/BackHandlerWrapper';
 
 import Login from '../screens/Auth/login'
 import Home from '../screens/Home/home'
@@ -25,6 +27,7 @@ import StoreLocator from '../screens/Other/storeLocator';
 import Favorites from '../screens/Cart/favoriteScreen';
 import Cart from '../screens/Cart/cartScreen';
 import Filter from '../screens/Cart/FilterScreen';
+import Order from '../screens/Order/OrderScreen';
 
 
 const Stack = createStackNavigator();
@@ -33,22 +36,33 @@ const Drawer = createDrawerNavigator();
 
 
 const AppContent = () => {
+  const { hasToken } = useContext(AuthContext);
   const { fontsLoaded } = useContext(FontContext);
-
-  if (!fontsLoaded) {
+  if (!hasToken) {
     return null;
   }
 
+  if (!fontsLoaded ) {
+    return null;
+  }
+
+ 
 
   return (
     <NavigationContainer>
+      <BackHandlerWrapper>
       <Drawer.Navigator
-        initialRouteName="Main"
+        // initialRouteName="Main"
         drawerContent={(props) => <CustomDrawerContent {...props}
-        drawerPosition="right"                // Change drawer position to right
-        drawerContentOptions={{activeTintColor: '#e91e63',}}
-        drawerStyle={{width: 240, }}
-        screenOptions={{headerShown: false,}} // Disable default header with drawer icon
+        screenOptions={{
+          drawerPosition: 'right',
+          headerShown: false,
+          drawerStyle:{right:0},
+          drawerActiveBackgrondColor: '#4748FF',
+
+        }}
+        // drawerContentOptions={{activeTintColor: '#e91e63',}}
+        drawerStyle={{width: 140, }}
         />}>
         <Drawer.Screen name="Main" component={Main}/>
         <Drawer.Screen name="Registration" component={Registration} />
@@ -65,19 +79,23 @@ const AppContent = () => {
         <Drawer.Screen name="Favorites" component={Favorites} />
         <Drawer.Screen name="Cart" component={Cart} />
         <Drawer.Screen name="Filter" component={Filter} />
-      </Drawer.Navigator>
+        <Drawer.Screen name="Order" component={Order} />
+        </Drawer.Navigator>
+        </BackHandlerWrapper>
     </NavigationContainer>
   );
 }
 
 export default function AppNavigator() {
   return (
-    <UserProvider>
-      <ProductProvider>
-        <FontProvider>
-          <AppContent />
-        </FontProvider>
-       </ProductProvider>
-     </UserProvider>
+    <AuthProvider>
+      <UserProvider>
+        <ProductProvider>
+          <FontProvider>
+            <AppContent />
+          </FontProvider>
+        </ProductProvider>
+      </UserProvider>
+      </AuthProvider>
   );
 }

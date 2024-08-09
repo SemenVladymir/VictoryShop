@@ -12,7 +12,8 @@ const RegistrationScreen = ({navigation}) => {
 
     const validationSchema = Yup.object().shape({
         username: Yup.string().required('Будь ласка, введіть логін'),
-        name: Yup.string().required('Будь ласка, введіть ім\'я'),
+        firstname: Yup.string().required('Будь ласка, введіть ім\'я'),
+        lastname: Yup.string().required('Будь ласка, введіть прізвище'),
         email: Yup.string().required('Будь ласка, введіть email'),
         password: Yup.string().min(8, 'Пароль повинен мати не меньше 8 символів').required('Будь ласка, введіть пароль'),
         birthDate: Yup.string().matches(/^\d{4}-\d{2}-\d{2}$/, 'Дата народження повинна бути в форматі РРРР-ММ-ДД')
@@ -23,12 +24,11 @@ const RegistrationScreen = ({navigation}) => {
     // Логика регистрации пользователя
       console.log('Регистрация', values);
     try {
-        await API.register(values.username, values.password, values.email, 'User', values.birthDate);
+        await API.register(values.username, values.password, values.email, 'User', values.birthDate, values.firstname, values.lastname);
         //navigation.navigate('Home');
-          console.log("Registration OK");
+          console.log("You Registered");
                     
-               
-          navigation.navigate('Profile');
+          navigation.navigate('Login');
       } catch (err) {
           console.log(`login error: ${err}`);
           setError('Login failed');
@@ -42,7 +42,7 @@ const RegistrationScreen = ({navigation}) => {
 
   return (
     <Formik
-      initialValues={{username: '', name: '', email: '', password: '', birthDate: '',  }}
+      initialValues={{username: '', name: '', email: '', password: '', birthDate: '', firstname: '', lastname: '' }}
       validationSchema={validationSchema}
       onSubmit={handleRegister}
     >
@@ -66,12 +66,22 @@ const RegistrationScreen = ({navigation}) => {
           <TextInput
             style={[globalStyles.defaultText, styles.input]}
             placeholder="Ім'я*"
-            onChangeText={handleChange('name')}
-            onBlur={handleBlur('name')}
-            value={values.name}
+            onChangeText={handleChange('firstname')}
+            onBlur={handleBlur('firstname')}
+            value={values.firstname}
           />
-          {touched.name && errors.name ? (
-            <Text style={[globalStyles.defaultText, styles.errorText]}>{errors.name}</Text>
+          {touched.firstname && errors.firstname ? (
+            <Text style={[globalStyles.defaultText, styles.errorText]}>{errors.firstname}</Text>
+              ) : null}
+          <TextInput
+            style={[globalStyles.defaultText, styles.input]}
+            placeholder="Прізвище*"
+            onChangeText={handleChange('lastname')}
+            onBlur={handleBlur('lastname')}
+            value={values.lastname}
+          />
+          {touched.lastname && errors.lastname ? (
+            <Text style={[globalStyles.defaultText, styles.errorText]}>{errors.lastname}</Text>
           ) : null}
           <TextInput
             style={[globalStyles.defaultText, styles.input]}

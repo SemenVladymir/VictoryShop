@@ -3,13 +3,15 @@ import { View, Text, FlatList, StyleSheet, Image, SafeAreaView, Pressable } from
 import Header from '../../components/common/header';
 import globalStyles from '../Other/styles';
 import { useNavigation } from '@react-navigation/native';
+import BackHandlerWrapper from '../../components/common/BackHandlerWrapper';
 
 const favorites = [
   {
     id: '1',
     name: 'ZERØGRAND Running Shoes',
     price: '7 200',
-    image: require('../../assets/images/ProductImage.png'), // Replace with your image path
+    // image: require('../../assets/images/ProductImage.png'), // Replace with your image path
+    image: 'https://megasport.ua/api/s3/images/megasport-dev/products/3555570144/66323e8e452b0-6389105.jpeg',
     cathegory: 'для чоловіків',
     discount: 20,
   },
@@ -17,26 +19,27 @@ const favorites = [
     id: '2',
     name: 'Футболка Puma Essentials+',
     price: '990',
-    image: require('../../assets/images/ProductImage.png'), // Replace with your image path
+    // image: require('../../assets/images/ProductImage.png'), // Replace with your image path
+    image: 'https://megasport.ua/api/s3/images/megasport-dev/products/3555570144/6666ef8bb59d6-68e7b68.jpeg',
     cathegory: 'для чоловіків',
     discount: null,
   },
-  {
-    id: '3',
-    name: 'Спортивний костюм Puma Poly Suit',
-    price: '2 890',
-    image: require('../../assets/images/ProductImage1.png'), // Replace with your image path
-    cathegory: 'для жінок',
-    discount: null,
-  },
-  {
-    id: '4',
-    name: 'Худі 4F Sweatshirt M694',
-    price: '2 099',
-    image: require('../../assets/images/ProductImage1.png'), // Replace with your image path
-    cathegory: 'для чоловіків',
-    discount: 20,
-  },
+  // {
+  //   id: '3',
+  //   name: 'Спортивний костюм Puma Poly Suit',
+  //   price: '2 890',
+  //   image: require('../../assets/images/ProductImage1.png'), // Replace with your image path
+  //   cathegory: 'для жінок',
+  //   discount: null,
+  // },
+  // {
+  //   id: '4',
+  //   name: 'Худі 4F Sweatshirt M694',
+  //   price: '2 099',
+  //   image: require('../../assets/images/ProductImage1.png'), // Replace with your image path
+  //   cathegory: 'для чоловіків',
+  //   discount: 20,
+  // },
   // {
   //   id: '5',
   //   name: 'ZERØGRAND Running Shoes',
@@ -63,14 +66,14 @@ const favorites = [
   // },
 ];
 
-export default function FavoritesScreen() {
-  const navigation = useNavigation();
+export default function FavoritesScreen({navigation}) {
+  // const navigation = useNavigation();
 
   const renderItem = ({ item }) => (
     <Pressable style={styles.item} onPress={() => navigation.navigate('ProductPage')}>
 
       <View style={styles.imagebox}>
-        <Image source={item.image} style={styles.image} />
+        <Image source={{ uri: item.image }} style={styles.image} />
         {item.discount ? <Image source={require('../../assets/images/Discount.png')} style={styles.discountImage}/> : null}
       </View>
 
@@ -90,6 +93,7 @@ export default function FavoritesScreen() {
   );
 
   return (
+    <BackHandlerWrapper navigation={navigation}>
     <SafeAreaView style={styles.container}>
       <Header />
       {favorites.length? <>
@@ -114,7 +118,8 @@ export default function FavoritesScreen() {
         </Pressable> */}
       </View>
       </>}
-    </SafeAreaView>
+      </SafeAreaView>
+      </BackHandlerWrapper>
   );
 }
 

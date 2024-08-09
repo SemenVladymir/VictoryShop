@@ -3,10 +3,10 @@ import React, {useState } from 'react';
 import { View, Text, StyleSheet,  Pressable, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import globalStyles from '../../screens/Other/styles';
-import { CheckBox, Icon } from 'react-native-elements';
+import { Icon } from 'react-native-elements';
 //import { Provider as PaperProvider, Menu, Button } from 'react-native-paper';
 
-const Header = ({ cartCount, onlyLOGO }) => {
+const Header = ({cartCount, onlyLOGO }) => {
   const navigation = useNavigation();
 
   const [visible, setVisible] = useState(false);
@@ -17,8 +17,9 @@ const Header = ({ cartCount, onlyLOGO }) => {
   return (
       <View style={!onlyLOGO ? styles.header : styles.headerwithoutlogo}>
       <View style={styles.logoContainer}>
-      <Image source={require('../../assets/images/Logo.png')} style={styles.image} />
-        {/* <Text style={[globalStyles.defaultText, styles.logo]}>LOGO</Text> */}
+      <Pressable onPress={() => navigation.navigate('Favorites')}>
+        <Image source={require('../../assets/images/Logo.png')} style={styles.image} />
+      </Pressable>
       </View>
       {!onlyLOGO ? (
         <View style={styles.icons}>

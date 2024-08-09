@@ -9,41 +9,59 @@ class API {
     API.instance = this;
 
     this.baseUrl = 'https://localhost:7000/api';
+    // this.baseUrl = 'https://192.168.0.110:8081/api'
     this.headers = {
       'Content-Type': 'application/json',
+      'charset': 'utf-8',
+      'X-Content-Type-Options': 'no-sniff',
     };
 
     return this;
   }
 
+  addDays = (days) => {
+    return (Date.now() + days*24*3600*1000);
+  };
+
   async setTokens(token, refreshToken) {
-    this.headers['Authorize'] = `Bearer ${token}`;
+    this.headers['Authorization'] = `Bearer ${token}`;
     await AsyncStorage.setItem('token', token);
     await AsyncStorage.setItem('refreshToken', refreshToken);
+    await AsyncStorage.setItem('RefreshTokenEndDate', new Date(this.addDays(7)).getTime());
   }
 
   async loadTokens() {
     const token = await AsyncStorage.getItem('token');
     const refreshToken = await AsyncStorage.getItem('refreshToken');
     if (token) {
-      this.headers['Authorize'] = `Bearer ${token}`;
+      this.headers['Authorization'] = `Bearer ${token}`;
     }
     this.refreshToken = refreshToken;
   }
 
   async refreshToken() {
-    const response = await fetch(`${this.baseUrl}/Auth/refresh-token`, {
+    const token = await AsyncStorage.getItem('token');
+    const refreshToken = await AsyncStorage.getItem('refreshToken');
+    this.headers['Authorization'] = `Bearer ${token}`;
+    try
+    {
+      const response = await fetch(`${this.baseUrl}/Auth/refresh-token`, {
       method: 'POST',
       headers: this.headers,
-      body: JSON.stringify({ token: this.refreshToken }),
-    });
+      body: JSON.stringify({ token, refreshToken }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to refresh token');
+      }
 
-    if (!response.ok) {
-      throw new Error('Failed to refresh token');
+      const data = await response.json();
+      await this.setTokens(data.token, data.refreshToken);
     }
-
-    const data = await response.json();
-    await this.setTokens(data.token, data.refreshToken);
+    catch (err)
+    {
+      console.log(err);
+    }
   }
 
   async fetchWithAuth(url, options) {
@@ -51,7 +69,7 @@ class API {
       const response = await fetch(url, options);
       if (response.status === 401) {
         await this.refreshToken();
-        options.headers['Authorize'] = this.headers['Authorize'];
+        options.headers['Authorization'] = this.headers['Authorization'];
         return fetch(url, options);
       }
       return response;
@@ -61,6 +79,7 @@ class API {
   }
 
   async get(auth, endpoint) {
+    // console.log(endpoint);
       const url = `${this.baseUrl}${endpoint}`;
       var response = Response.ok;
       if (auth)
@@ -96,19 +115,19 @@ class API {
     return response.json();
   }
 
-  async register(username, password, email, role = 'user', birthdate) {
+  async register(username, password, email, role = 'user', birthdate, firstname, lastname) {
     console.log(username);
     const response = await fetch(`${this.baseUrl}/Auth/register`, {
       method: 'POST',
       headers: this.headers,
-      body: JSON.stringify({ username, password, email, role }),
+      body: JSON.stringify({ username, password, email, role, birthdate, firstname, lastname }),
     });
 
     if (!response.ok) {
       throw new Error('Failed to register: ' + response.body);
     }
 
-    this.login(username, password);
+    // this.login(username, password);
     // const data = await response.json();
     // await this.setTokens(data.token, data.refreshToken);
   }
@@ -125,10 +144,10 @@ class API {
       if (!response.ok) {
         throw new Error('Failed to login');
       }
-
+      
       const data = await response.json();
-      console.log(data.token);
-      console.log(data.refreshToken);
+      console.log('Token after Login - '+data.token);
+      console.log('RefreshToken after Login - '+data.refreshToken);
       await this.setTokens(data.token, data.refreshToken);
     }
     catch (err)
@@ -140,10 +159,11 @@ class API {
   async logout() {
     await AsyncStorage.removeItem('token');
     await AsyncStorage.removeItem('refreshToken');
-    this.headers['Authorize'] = null;
+    await AsyncStorage.removeItem('RefreshTokenEndDate');
+    this.headers['Authorization'] = null;
   }
 
-  // Добавьте другие методы API (PUT, DELETE и т.д.) по мере необходимости
+  // Другие методы API (PUT, DELETE и т.д.) по мере необходимости
 }
 
 const instance = new API();

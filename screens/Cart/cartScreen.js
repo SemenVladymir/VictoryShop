@@ -3,14 +3,13 @@ import { View, Text, Image, Pressable, TextInput, StyleSheet, ScrollView, SafeAr
 import globalStyles from '../../screens/Other/styles';
 import Header from '../../components/common/header';
 import { useNavigation } from '@react-navigation/native';
-import { CheckBox } from 'react-native-elements';
 
 // Используем локаль 'uk-UA' для форматирования цифр с разделение на порядки по-украински
 const formatNumber = (number) => { return number.toLocaleString('uk-UA'); };
 
 
 const CartItem = ({ item, onIncrease, onDecrease, onRemove }) => {
-  const navigation = useNavigation();
+  // const navigation = useNavigation();
 
   return (
       <View style={styles.cartItem}>
@@ -52,8 +51,8 @@ const CartItem = ({ item, onIncrease, onDecrease, onRemove }) => {
   );
 };
 
-export default function CartScreen() {
-  const navigation = useNavigation();
+export default function CartScreen({ navigation }) {
+  // const navigation = useNavigation();
 
   const [cart, setCart] = useState([
       {
@@ -155,7 +154,7 @@ export default function CartScreen() {
 
   return (
       <SafeAreaView style={styles.container}>
-      <Header />
+      <Header cartCount={totalQuantity}/>
       {cart.length ? <>
         <View style={styles.title}>
             <Text style={[globalStyles.boldText, styles.titletext]}>Кошик</Text>
@@ -175,7 +174,7 @@ export default function CartScreen() {
             <Text style={[globalStyles.boldText, styles.totalText]}>Кількість товарів: {formatNumber(totalQuantity)} шт.</Text>
             <Text style={[globalStyles.boldText, styles.totalText]}>Вартість товарів: {formatNumber(totalAmount)} грн.</Text>
           </View>
-          <Pressable style={[styles.buySelectedButton, styles.buttonShadow]}>
+          <Pressable style={[styles.buySelectedButton, styles.buttonShadow]} onPress={() => navigation.navigate('Order')}>
             <Text style={[globalStyles.defaultText, styles.buttonText]}>Придбати обране</Text>
           </Pressable>
 
@@ -410,8 +409,8 @@ const styles = StyleSheet.create({
   checkboxBase: {
     width: 20,
     height: 20,
-    borderRadius: 2,
-    borderWidth: 2,
+    borderRadius: 5,
+    borderWidth: 1,
     borderColor: '#000',
     backgroundColor: 'transparent',
     justifyContent: 'center',
