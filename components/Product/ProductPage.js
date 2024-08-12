@@ -1,48 +1,145 @@
-import React from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Image, SafeAreaView, ScrollView, Pressable } from 'react-native';
 import Header from '../../components/common/header';
 import globalStyles from '../../screens/Other/styles';
+import { ProductContext } from '../../store/ProductContext';
+import { Icon } from 'react-native-elements';
+import Product from './Product';
+import { addNewData } from '../../services/AsyncStorageUtil';
 
-export default function ProductPage(...props) {
+
+export default function ProductPage({ navigation, route }) {
+  const { products, countries, colors, brands } = useContext(ProductContext);
+  const formatNumber = (number) => { return number.toLocaleString('uk-UA'); };
+  const { product, gender, discount } = route.params;
+  const [selectedImage, setSelectedImage] = useState('');
+  const [selectedSizeId, setSelectedSizeId] = useState('');
+  const sameproducts = products.filter(e => e.subcathegoryId === product.subcathegoryId && e.genderId === product.genderId && e.id !== product.id);
+  
+  useEffect(() => {
+    if (product.photos.length > 0) {
+      setSelectedImage(product.photos[0].url);
+    }
+    setSelectedSizeId(null);
+  }, [product.photos]);
+
+  const handlePress = (id) => {
+    setSelectedSizeId(id);
+  };
+
+  const handleFavorite = async (item) => {
+    addNewData('Favorites', item.id)
+    console.log('Add to Favorite');
+  };
+
+  const handleCart = () => {
+    // Implement the navigation to home screen here
+    // navigation.navigate('Main');
+    console.log('Go to Cart');
+  };
+
+  const getCountry = (product) => {
+    if (countries.find(e => e.id === product.countryId))
+      return (countries.find(e => e.id == product.countryId).name);
+  };
+  const getColor = (product) => {
+    if (colors.find(e => e.id === product.colorId))
+      return colors.find(e => e.id === product.colorId).name;
+  };
+  const getBrand = (product) => {
+    if (brands.find(e => e.id == product.brandId))
+      return brands.find(e => e.id == product.brandId).name;
+  };
+
   return (
-      <SafeAreaView style={styles.container}>
-        <Header cartCount={2} onlyLOGO={false}/>
+    <SafeAreaView style={styles.container}>
+      <Header cartCount={2} onlyLOGO={false}/>
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
       
-
-        <Text style={[globalStyles.defaultText, styles.productTitle]}>КРОСІВКИ ZERØGRAND</Text>
-        <Text style={[globalStyles.defaultText, styles.productTitle]}>Running Shoes</Text>
-        <Text style={[globalStyles.defaultText, styles.productSubtitle]}>для чоловіків</Text>
+      <View style={{flex: 1, flexDirection: 'column', marginHorizontal: 10, justifyContent: 'center', alignItems: 'center'}}>
+        <Text style={[globalStyles.defaultText, styles.productTitle]}>{product.name}</Text>
+        <Text style={[globalStyles.defaultText, styles.productSubtitle]}>{gender}</Text>
               
         <View style={styles.priceContainer}>
-          <Text style={[globalStyles.defaultText, styles.oldPrice]}>9,000 грн</Text>
-          <Text style={[globalStyles.defaultText, styles.newPrice]}>-20% 7,200 грн</Text>
+        {discount > 0 ? <>
+              <Text style={[globalStyles.boldText, styles.newPrice]}>{formatNumber(product.price)} грн  </Text>
+              <Text>          </Text>
+          <Text style={[globalStyles.defaultText, styles.oldPrice]}>{formatNumber(product.price/(100 - discount)*100)} грн</Text> 
+        </> :
+            <Text style={[globalStyles.boldText, styles.Price]}>{formatNumber(product.price)} грн</Text>
+        }
         </View>
+          
+          <View style={{ height: 300, width: '100%', margin: 0, padding: 0, justifyContent: 'center', alignItems: 'center', borderRadius: 25, overflow: 'hidden', position: 'relative' }}>
+          <Image source={{ uri: selectedImage }} style={styles.productImage} />
+          {discount > 0 ? <Image source={require('../../assets/images/Discount.png')} style={styles.discountImage}/> : null}
+          </View>
 
-        {/* <View style={styles.saleBadge}>
-          <Text style={styles.saleText}>sale</Text>
-        </View> */}
-
-        <Image
-          source={{ uri: 'https://megasport.ua/api/s3/images/megasport-dev/products/3555570144/66323e8f8b981-68e7b68.jpeg' }}
-          style={styles.productImage}
-        />
-              
-        <Image
-          source={{ uri: './assets/images/Discount.png' }}
-          style={styles.discountImage}
-        />
-
-              <View style={styles.navigation}>
+              {/* <View style={styles.navigation}>
                   <Pressable>
                       <Image source={{uri: './assets/images/StepLeft.png'}}/>
                   </Pressable>
                   <Pressable>
                       <Image source={{uri: './assets/images/StepRight.png'}}/>
-                  </Pressable>
-          {/* <Button title="←" onPress={() => {}} />
-          <Button title="→" onPress={() => {}} /> */}
+                  </Pressable> */}
+          {/* Горизонтальная полоса прокрутки */}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
+        {product.photos.map((photo, index) => (
+          <Pressable key={index} onPress={() => setSelectedImage(photo.url)}>
+            <Image source={{ uri: photo.url }} style={styles.thumbnail} />
+          </Pressable>
+        ))}
+          </ScrollView>
+
+          <Text style={[globalStyles.boldText, {fontSize: 20, marginTop: 20}]}>Виберіть розмір</Text>
+          <View style={styles.sizesbox}>
+          
+          {product.sizes.map((size, index) => (
+            <Pressable
+              key={index}
+              onPress={() => handlePress(size.id)}
+              style={[
+                styles.sizeitem,
+                selectedSizeId === size.id && styles.selectedSizeItem, // Применяем стиль для выбранного элемента
+              ]}
+            >
+              <Text style={{ color: selectedSizeId === size.id ? '#fff' : '#000' }}>
+                {size.iname}
+              </Text>
+            </Pressable>
+          ))}
+          </View>
+          
         </View>
+        <View style={styles.buttons}>
+            <Pressable style={[styles.buttonShadow, styles.buttonFavorive]} onPress={()=>handleFavorite(product)}>
+            <Text style={[globalStyles.defaultText, styles.buttonText]}>Обраний  </Text>
+            <Icon name="favorite-border" size={20} color="#000"/>
+            </Pressable>
+            <Pressable style={[styles.buttonShadow, styles.buttonCart]} onPress={handleCart}>
+                <Text style={[globalStyles.defaultText, styles.buttonTextHome]}>Додати в кошик</Text>
+            </Pressable>
+        </View>
+        
+        <View style={styles.discountbox}>
+          <Text style={[globalStyles.boldText, { fontSize: 20 }]}>Опис</Text>
+          <Text style={[globalStyles.boldText, { fontSize: 16 }]}>Бренд: {getBrand(product)}</Text>
+          <Text style={[globalStyles.boldText, { fontSize: 16 }]}>Страна виробник: {getCountry(product)}</Text>
+          <Text style={[globalStyles.boldText, { fontSize: 16 }]}>Колір: {getColor(product)}</Text>
+          <Text style={[globalStyles.defaultText, { fontSize: 16, marginTop: 10, textAlign: 'justify' }]}>{ product.description }</Text>
+        </View>
+
+        <Text style={[globalStyles.boldText, {fontSize: 18, marginTop: 20}]}>Вам також може сподобатись</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
+        {sameproducts.map((item, index) => (
+            <Pressable key={index} onPress={() => this.handlePress(item)}>
+              {/* <View style={{ width: 200, height: 200, marginBottom: 60 }}> */}
+                <Product item={item} />
+              {/* </View> */}
+            </Pressable>
+        ))}
+          </ScrollView>
+
       </ScrollView>
     </SafeAreaView>
   );
@@ -57,34 +154,17 @@ const styles = StyleSheet.create({
       marginTop: 10,
     alignItems: 'center',
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    padding: 16,
-  },
-  logo: {
-    flex: 1,
-  },
-  logoText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  icons: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: 100,
-  },
   productTitle: {
     fontSize: 20,
-    fontWeight: 300,
+    flexWrap: 'wrap',
+    textAlign: 'justify',
   },
   productSubtitle: {
     fontSize: 16,
     //color: 'gray',
   },
-    priceContainer: {
-      paddingVertical: 5,
+  priceContainer: {
+    paddingVertical: 5,
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -94,6 +174,9 @@ const styles = StyleSheet.create({
   },
   newPrice: {
     color: 'blue',
+  },
+  Price: {
+    marginRight: 8,
   },
   saleBadge: {
     backgroundColor: 'yellow',
@@ -107,23 +190,101 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  productImage: {
-    width: '90%',
-    height: 180,
-    resizeMode: 'contain',
+    productImage: {
+      width: 280,
+      height: 300,
+      resizeMode: 'cover',
+      borderRadius: 5,
     },
     discountImage: {
-        width: 50,
-        height: 50,
-        resizeMode: 'contain',
-        position: 'relative',
-        marginTop: -280,
-        marginLeft: -230,
-      },
+      position: 'absolute',
+      top: 10,
+      left: 10,
+      width: 40,
+      height: 40,
+      resizeMode: 'contain',
+    },
   navigation: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: 100,
     marginTop: 270,
   },
+  scrollView: {
+    flexDirection: 'row',
+    marginTop: 20,
+  },
+  thumbnail: {
+    width: 150,
+    height: 150,
+    marginRight: 5,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  sizesbox: {
+    flexDirection: 'row',
+    flexWrap: 'wrap', // Позволяет располагать элементы в несколько рядов
+    justifyContent: 'space-around',
+    marginVertical: 10,
+  },
+  sizeitem: {
+    backgroundColor: '#f0f0f0', // Дефолтный цвет кнопки
+    padding: 10,
+    margin: 5,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#777',
+    alignItems: 'center',
+    width: 80, // Устанавливаем фиксированную ширину для кнопок
+  },
+  selectedSizeItem: {
+    backgroundColor: '#FFC700', // Цвет кнопки при выборе
+  },
+  buttons: {
+    flex: 1,
+    marginTop: 10,
+    width: '100%',
+    alignItems: 'center',
+    },
+    buttonFavorive: {
+        backgroundColor: '#FFC700',
+        padding: 12,
+        borderRadius: 25,
+        marginTop: 20,
+        width: '70%',
+      alignItems: 'center',
+      flexDirection: 'row',
+        justifyContent: 'center',
+    },
+    buttonCart: {
+        backgroundColor: '#4748FF',
+        padding: 12,
+        borderRadius: 25,
+        marginTop: 30,
+        width: '70%',
+        alignItems: 'center',
+    },
+    buttonText: {
+        color: '#000',
+        fontSize: 16,
+    },
+    buttonTextHome: {
+        color: '#fff',
+        fontSize: 16,
+    },
+    buttonShadow: {
+        shadowColor: '#000',
+        shadowOffset: {
+        width: 3,
+        height: 3,
+        },
+        shadowOpacity: 0.4,
+        shadowRadius: 5,
+        elevation: 5,
+  },
+  discountbox: {
+    marginVertical: 20,
+    marginHorizontal: 10
+  }
 });

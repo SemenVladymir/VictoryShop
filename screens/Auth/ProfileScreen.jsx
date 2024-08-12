@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { ScrollView, View, Text, Image, StyleSheet, TextInput, Platform, Alert, Pressable } from 'react-native';
 import { Icon } from 'react-native-elements';
 import globalStyles from '../Other/styles';
@@ -6,15 +6,25 @@ import Header from '../../components/common/header';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import { Camera } from 'expo-camera';
+import { AuthContext } from '../../store/AuthContext';
 
-const Profile = ({navigation}) => {
-  const [imageUri, setImageUri] = useState('../../assets/images/Profilephoto.png');
+const Profile = ({ navigation }) => {
+  const { username, firstname, lastname, phonenumber, birthdate, userphoto, email, saveImageToLocalDirectory } = useContext(AuthContext);
+  const [imageUri, setImageUri] = useState(require('../../assets/images/No_Image.jpg'));
   const [savedImageUri, setSavedImageUri] = useState(null);
   const [error, setError] = useState('');
 
   const [hasCameraPermission, setHasCameraPermission] = useState(null);
   const [camera, setCamera] = useState(null);
 
+  // useEffect(() => {
+  //   if (userphoto) {
+  //     setImageUri(userphoto);
+  //   }
+  //   setImageUri(null);
+  // }, [userphoto]);
+
+  //Получение разрешения для выбора изображения для профиля
   const showImagePickerOptions = () => {
     Alert.alert("Екран вибора фото для профілю", "Виберіть один з вариантів:", [
       {
@@ -32,7 +42,7 @@ const Profile = ({navigation}) => {
     ]);
   };
 
-
+//Выбор изображения через галерею
   const openImagePicker = async () => {
     // Запрашиваем разрешения на доступ к галерее
     if (Platform.OS !== 'web') {
@@ -61,41 +71,12 @@ const Profile = ({navigation}) => {
     }
   };
 
-  const saveImageToLocalDirectory = async (uri) => {
-    try {
-      const fileName = 'Profilephoto.png'; // Название файла, под которым он будет сохранен
-      const directory = FileSystem.documentDirectory + 'assets/images/';
-      console.log("Directory is - "+directory);
-      // Убедитесь, что директория существует, иначе создайте ее
-      const dirInfo = await FileSystem.getInfoAsync(directory);
-      if (!dirInfo.exists) {
-        await FileSystem.makeDirectoryAsync(directory, { intermediates: true });
-      }
-
-      const destPath = directory + fileName;
-      await FileSystem.copyAsync({
-        from: uri,
-        to: destPath,
-      });
-      setSavedImageUri(destPath);
-      console.log(`Image saved to: ${destPath}`);
-    } catch (error) {
-      console.error('Error saving image:', error);
-    }
-  };
-
+  
+  //Создание изображения через камеру
   const openCamera = async () => {
     // Запрашиваем разрешения на использование камеры
     const CameraStatus = await Camera.requestCameraPermissionsAsync();
     setHasCameraPermission(CameraStatus.status === 'granted');
-
-
-
-    // const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    // if (status !== 'granted') {
-    //   alert('Sorry, we need camera permissions to make this work!');
-    //   return;
-    // }
 
     // Открываем камеру для создания фото
     let result = await ImagePicker.launchCameraAsync({
@@ -107,6 +88,7 @@ const Profile = ({navigation}) => {
     if (!result.canceled) {
       setImageUri(result.assets[0].uri);
       console.log(imageUri);
+      saveImageToLocalDirectory(result.assets[0].uri);
     }
   };
 
@@ -117,7 +99,7 @@ const Profile = ({navigation}) => {
       <ScrollView style={styles.container}>
       <View style={styles.profileContainer}>
         <Pressable onPress={showImagePickerOptions}>
-            <Image source={{ uri: imageUri }} style={styles.profileImage} />
+            {/* <Image source={{ uri: imageUri }?{ uri: imageUri }: require('../../assets/images/No_Image.jpg')} style={styles.profileImage} /> */}
           <Text style={[globalStyles.defaultText, styles.changePhotoText]}>Змінити фото</Text>
         </Pressable>
 

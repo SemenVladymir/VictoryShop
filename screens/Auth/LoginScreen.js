@@ -56,6 +56,7 @@ export default function Login() {
                 />
                 <TextInput
                     style={[globalStyles.defaultText, styles.input]}
+                    secureTextEntry={true}
                     placeholder="Password"
                     placeholderTextColor="#000"
                     value={password}

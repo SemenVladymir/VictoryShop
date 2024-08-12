@@ -1,23 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { View, Text, TextInput, StyleSheet, Pressable, Image } from 'react-native';
 import { Icon } from'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
-import globalStyles from '../Other/styles';
+import globalStyles from './styles';
 import Header from '../../components/common/header';
+import { ProductContext } from '../../store/ProductContext';
 
 const SearchScreen = ({ navigation }) => {
-const [searchQuery, setSearchQuery] = useState('');
-const [isFocused, setIsFocused] = useState(false);
+  const { products } = useContext(ProductContext);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isFocused, setIsFocused] = useState(false);
 // const navigation = useNavigation();
 
   const handleSearch = () => {
-    // Implement the search functionality here
-    console.log('Search Query:', searchQuery);
-  };
-
-  const handleHome = () => {
-    // Implement the navigation to home screen here
-    navigation.navigate('Main');
+    const searchProducts = products.filter(e => e.name.includes(searchQuery));
+    navigation.navigate('Catalog', {searchproducts: searchProducts});
   };
 
   return (
@@ -46,7 +43,7 @@ const [isFocused, setIsFocused] = useState(false);
             <Pressable style={[styles.buttonShadow, styles.buttonFind]} onPress={handleSearch}>
                 <Text style={[globalStyles.defaultText, styles.buttonText]}>Знайти</Text>
             </Pressable>
-            <Pressable style={[styles.buttonShadow, styles.buttonHome]} onPress={handleHome}>
+            <Pressable style={[styles.buttonShadow, styles.buttonHome]} onPress={()=>navigation.navigate('Main')}>
                 <Text style={[globalStyles.defaultText, styles.buttonTextHome]}>Головна</Text>
             </Pressable>
           </View>

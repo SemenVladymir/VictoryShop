@@ -1,6 +1,6 @@
 class Product {
   constructor(Id, Name, Description, Price, Photos, CathegoryId, DiscountId,
-    IsAvailable, CountryId, BrandId, GenderId, SubcathegoryId, SportId, ColorId) {
+    IsAvailable, CountryId, BrandId, GenderId, SubcathegoryId, SportId, ColorId, ListOfSize) {
     this.id = Id;
     this.name = Name;
     this.description = Description;
@@ -14,8 +14,9 @@ class Product {
     this.genderId = GenderId;
     this.subcathegoryId = SubcathegoryId;
     this.quantity = 1;
-    this.sportid = SportId;
-    this.colorid = ColorId;
+    this.sportId = SportId;
+    this.colorId = ColorId;
+    this.sizes = ListOfSize;
   }
 
   formatPrice() {

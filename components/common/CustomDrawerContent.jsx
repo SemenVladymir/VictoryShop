@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { View, Text, StyleSheet, Pressable, Image, ImageBackground} from 'react-native';
 import { DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer';
 import globalStyles from '../../screens/Other/styles';
-import { MaterialIcons } from '@expo/vector-icons';
+import { AuthContext } from '../../store/AuthContext';
+
 
 
 const CustomDrawerContent = (props) => {
+  const { username, firstname, lastname, email, userphoto } = useContext(AuthContext);
   const [isMenOpen, setMenOpen] = useState(false);
   const [isWomenOpen, setWomenOpen] = useState(false);
   const [isKidsOpen, setKidsOpen] = useState(false);
@@ -15,9 +17,10 @@ const CustomDrawerContent = (props) => {
       contentContainerStyle={{ backgroundColor: '#FFC700' }}>
       <ImageBackground source={require('../../assets/images/backgroun2.png')} style={{ padding: 20 }}>
         <Pressable onPress={() => props.navigation.navigate('Profile')}>
-          <Image source={require('../../assets/images/Profilephoto.png')} style={{ height: 80, width: 80, borderRadius: 40, margin: 20 }} />
-          <Text style={[globalStyles.defaultText, { fontSize: 18, color: '#fff' }]}>Joan Gerkovich</Text>
-          <Text style={[globalStyles.defaultText, { fontSize: 16, color: '#fff' }]}>200 грн.</Text>
+          <Image source={{uri: userphoto}?{uri: userphoto}:require('../../assets/images/No_Image.jpg')} style={{ height: 80, width: 80, borderRadius: 40, margin: 20 }} />
+          <Text style={[globalStyles.defaultText, { fontSize: 20, color: '#fff', marginBottom: 10, marginTop: -10 }]}>{firstname ? firstname : 'None'} {lastname ? lastname : null}</Text>
+          <Text style={[globalStyles.defaultText, { fontSize: 16, color: '#fff' }]}>Login: { username ? username: 'None' }</Text>
+          <Text style={[globalStyles.defaultText, { fontSize: 16, color: '#fff' }]}>Email: { email ? email : 'None'}</Text>
         </Pressable>
       </ImageBackground>
       <DrawerItem
@@ -84,8 +87,8 @@ const CustomDrawerContent = (props) => {
             onPress={() => props.navigation.navigate('Search')}
           />
           <DrawerItem
-            label={()=><Text style={globalStyles.boldText}>ProductItem</Text>}
-            onPress={() => props.navigation.navigate('ProductItem')}
+            label={()=><Text style={globalStyles.boldText}>CatalogScreen</Text>}
+            onPress={() => props.navigation.navigate('Catalog')}
           />
           <DrawerItem
             label={()=><Text style={globalStyles.boldText}>ProductPage</Text>}

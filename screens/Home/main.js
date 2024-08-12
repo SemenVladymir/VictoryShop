@@ -17,7 +17,7 @@ const Main = () => {
         <Text style={[globalStyles.boldText, styles.bodyText1]}>{`Твоя перемога ближче,\n ніж здається!`}</Text>
         <Text style={[globalStyles.defaultText, styles.bodyText2]}>{`Знижка до 70%\n на весь асортимент спортивних товарів!`}</Text>
         
-        <Pressable style={styles.button} onPress={() => navigation.navigate('Profile')}>
+        <Pressable style={styles.button} onPress={() => navigation.navigate('Catalog')}>
           <Text style={[globalStyles.defaultText, styles.buttonText]}>До покупок</Text>
         </Pressable>
       </View>

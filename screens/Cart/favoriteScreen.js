@@ -1,73 +1,46 @@
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, Image, SafeAreaView, Pressable } from 'react-native';
 import Header from '../../components/common/header';
 import globalStyles from '../Other/styles';
 import { useNavigation } from '@react-navigation/native';
 import BackHandlerWrapper from '../../components/common/BackHandlerWrapper';
+import { getData, removeDataItemById } from '../../services/AsyncStorageUtil';
+import { ProductContext } from '../../store/ProductContext';
 
-const favorites = [
-  {
-    id: '1',
-    name: 'ZERØGRAND Running Shoes',
-    price: '7 200',
-    // image: require('../../assets/images/ProductImage.png'), // Replace with your image path
-    image: 'https://megasport.ua/api/s3/images/megasport-dev/products/3555570144/66323e8e452b0-6389105.jpeg',
-    cathegory: 'для чоловіків',
-    discount: 20,
-  },
-  {
-    id: '2',
-    name: 'Футболка Puma Essentials+',
-    price: '990',
-    // image: require('../../assets/images/ProductImage.png'), // Replace with your image path
-    image: 'https://megasport.ua/api/s3/images/megasport-dev/products/3555570144/6666ef8bb59d6-68e7b68.jpeg',
-    cathegory: 'для чоловіків',
-    discount: null,
-  },
-  // {
-  //   id: '3',
-  //   name: 'Спортивний костюм Puma Poly Suit',
-  //   price: '2 890',
-  //   image: require('../../assets/images/ProductImage1.png'), // Replace with your image path
-  //   cathegory: 'для жінок',
-  //   discount: null,
-  // },
-  // {
-  //   id: '4',
-  //   name: 'Худі 4F Sweatshirt M694',
-  //   price: '2 099',
-  //   image: require('../../assets/images/ProductImage1.png'), // Replace with your image path
-  //   cathegory: 'для чоловіків',
-  //   discount: 20,
-  // },
-  // {
-  //   id: '5',
-  //   name: 'ZERØGRAND Running Shoes',
-  //   price: '7 200',
-  //   image: require('../../assets/images/ProductImage.png'), // Replace with your image path
-  //   cathegory: 'для чоловіків',
-  //   discount: null,
-  // },
-  // {
-  //   id: '6',
-  //   name: 'Худі 4F Sweatshirt M694',
-  //   price: '2 099',
-  //   image: require('../../assets/images/ProductImage1.png'), // Replace with your image path
-  //   cathegory: 'для чоловіків',
-  //   discount: null,
-  // },
-  // {
-  //   id: '7',
-  //   name: 'Худі 4F Sweatshirt M694',
-  //   price: '2 099',
-  //   image: require('../../assets/images/ProductImage1.png'), // Replace with your image path
-  //   cathegory: 'для чоловіків',
-  //   discount: 20,
-  // },
-];
+// const favorites = [
+//   {
+//     id: '1',
+//     name: 'ZERØGRAND Running Shoes',
+//     price: '7 200',
+//     // image: require('../../assets/images/ProductImage.png'), // Replace with your image path
+//     image: 'https://megasport.ua/api/s3/images/megasport-dev/products/3555570144/66323e8e452b0-6389105.jpeg',
+//     cathegory: 'для чоловіків',
+//     discount: 20,
+//   },
+//   {
+//     id: '2',
+//     name: 'Футболка Puma Essentials+',
+//     price: '990',
+//     // image: require('../../assets/images/ProductImage.png'), // Replace with your image path
+//     image: 'https://megasport.ua/api/s3/images/megasport-dev/products/3555570144/6666ef8bb59d6-68e7b68.jpeg',
+//     cathegory: 'для чоловіків',
+//     discount: null,
+//   },
+// ];
 
-export default function FavoritesScreen({navigation}) {
-  // const navigation = useNavigation();
+
+
+export default function FavoritesScreen({ navigation }) {
+  const { products } = useContext(ProductContext);
+  const [favorites, setFavorites] = useState([]);
+
+
+  useEffect(() => {
+    const favoritesId = getData('Favorites');
+    if (favoritesId.length > 0) {
+      setFavorites(products.filter(product => favoritesId.includes(product.id)));
+    }
+  }, []);
 
   const renderItem = ({ item }) => (
     <Pressable style={styles.item} onPress={() => navigation.navigate('ProductPage')}>

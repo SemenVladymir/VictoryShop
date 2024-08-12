@@ -5,8 +5,8 @@ import globalStyles from '../Other/styles';
 import API from '../../services/api';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import { UserContext } from '../../store/UserContext';
-import { logAsyncStorage } from '../../store/AsyncStorageUtil';
+// import { UserContext } from '../../store/UserContext';
+// import { logAsyncStorage } from '../../store/AsyncStorageUtil';
 
 const RegistrationScreen = ({navigation}) => {
 

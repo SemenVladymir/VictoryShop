@@ -5,16 +5,19 @@ import { Product, Color, Country, Cathegory, Subcathegory, Brand, Gender, Size, 
 
 const ProductContext = createContext();
 
-// Функция для извлечения массива объектов универсального класса из базы данных сервера
+// Функция для извлечения массива объектов универсального класса из AsyncStorage или базы данных сервера
 const fetchData = async (url, key, Class, update=false) => {
   var response;
   try {
     const ArrayString = await AsyncStorage.getItem(key);
     if (ArrayString != null) {
-      response = JSON.parse(productArrayString);
+      response = JSON.parse(ArrayString);
+      // console.log(key+' respons from AsyncStorage - '+response);
     }
-    else if (ArrayString == null || response.length == 0 || update) {
+    if (ArrayString == null || response.length == 0 || update) {
+      // console.log(key+' respons1 - '+response);
       response = await API.get(false, url);
+      // console.log(key+' respons from API - '+response);
     }
     // console.log(Class+' - '+response.content);
     return response.map(item => new Class(item.Id, item.Name));
@@ -34,8 +37,32 @@ const saveArrayToAsyncStorage = async (key, ClassArray) => {
   }
 };
 
+//Функция получения фотографий продукта по id коду продукта
+const getPhotos = async (productId) => {
+  try {
+    const response = await API.get(false, '/Product/GetPhotosByProductId' + productId);
+    // console.log('Photos - '+response.data);
+    return response.map(item => new Photo(item.Id, item.URL, item.ProductId, item.Details));
+  } catch (error) {
+    console.error('Error fetchin photos - ' +error);
+    return [];
+  }
+};
+
+//Функция получения размеров продукта по id коду продукта
+const getSizes = async (productId) => {
+  try {
+    const response = await API.get(false, '/Product/GetSizesByProductId' + productId);
+    // console.log('Photos - '+response.data);
+    return response.map(item => new Size(item.Id, item.InternationalName, item.LocalName));
+  } catch (error) {
+    console.error('Error fetchin sazes - ' +error);
+    return [];
+  }
+};
+
 // Функция для извлечения массива объектов сложных классов из AsyncStorage или базы данных 
-const loadArray = async (key, update = false) => {
+const loadArray = async (key, update = true) => {
   var ArrayData;
   try {
     switch (key)
@@ -49,10 +76,13 @@ const loadArray = async (key, update = false) => {
         return await Promise.all(ArrayData.map(async (Data) => {
           const product = new Product(Data.Id, Data.Name, Data.Description, Data.Price, [],
             Data.CathegoryId, Data.DiscountId, Data.IsAvailable, Data.CountryId, Data.BrandId, Data.GenderId,
-            Data.SubcathegoryId, Data.SportId, Data.ColorId);
+            Data.SubcathegoryId, Data.SportId, Data.ColorId, []);
           const photos = await getPhotos(product.id);
+          const sizes = await getSizes(product.id);
           if (photos)
             product.photos = photos;
+          if (sizes)
+            product.sizes = sizes;
           return product;
         }
         ));
@@ -78,8 +108,6 @@ const loadArray = async (key, update = false) => {
           ArrayData = await API.get(false, '/Product/GetAllDiscounts');
         // console.log(ArrayData);
         return ArrayData.map(Data => new Discount(Data.Id, Data.Name, Data.StartDate, Data.EndDate, Data.Percent));
-      
-      
     }
     return []; // Если данных нет, возвращаем пустой массив
   } catch (error) {
@@ -88,16 +116,6 @@ const loadArray = async (key, update = false) => {
   }
 };
 
-const getPhotos = async (productId) => {
-  try {
-    const response = await API.get(false, '/Product/GetPhotosByProductId' + productId);
-    // console.log('Photos - '+response.data);
-    return response.map(item => new Photo(item.Id, item.URL, item.ProductId, item.Details));
-  } catch (error) {
-    console.error('Error fetchin photos - ' +error);
-    return [];
-  }
-};
 
 const ProductProvider = ({ children }) => {
   const [cathegories, setCathegories] = useState([]);
@@ -107,13 +125,12 @@ const ProductProvider = ({ children }) => {
   const [colors, setColors] = useState([]);
   const [brands, setBrands] = useState([]);
 
-  // const [sizes, setSizes] = useState([]);
-  const [photos, setPhotos] = useState([]);
   const [discounts, setDiscounts] = useState([]);
-
   const [subcathegories, setSubcathegories] = useState([]);
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true); // Для индикации загрузки данных
+
+ //Для индикации загрузки данных
+  const [loading, setLoading] = useState(true);
 
 
   //Загрузка данных по продуктам
@@ -150,14 +167,6 @@ const ProductProvider = ({ children }) => {
         saveArrayToAsyncStorage('Subcathegory', subcathegories);
         setDiscounts(discountList);
         saveArrayToAsyncStorage('Discount', discounts);
-        // console.table(sports);
-        // console.table(colors);
-        // console.table(genders);
-        // console.table(countries);
-        // console.table(cathegories);
-        // console.table(products);
-        // console.table(subcathegories);
-        // console.table(brands);
 
       } catch (error) {
         console.error('Error loading product data', error);
