@@ -88,12 +88,41 @@ const data = [
 const ProductItem = ({ route }) => {
   const navigation = useNavigation();
   const { products } = useContext(ProductContext);
-  const { searchproducts = products} = route.params || {};
+  const { searchproducts, filter} = route.params || {};
   const [catalog, setCatalog] = useState(searchproducts);
   
   useEffect(() => {
+    if (searchproducts)
       setCatalog(searchproducts);
-  }, [searchproducts]);
+    else if (filter) {
+      const filteredProducts = products.filter(product => {
+        if (filter === 'menclothes') {
+          return product.genderId == 3 && product.cathegoryId == 2;
+        } else if (filter === 'menshoes') {
+          return product.genderId == 3 && product.cathegoryId == 3;
+        } else if (filter === 'menaccessories') {
+          return product.genderId == 3 && product.cathegoryId == 4;
+        } else if (filter === 'womenclothes') {
+          return product.genderId == 4 && product.cathegoryId == 2;
+        } else if (filter === 'womenshoes') {
+          return product.genderId == 4 && product.cathegoryId == 3;
+        } else if (filter === 'womenaccessories') {
+          return product.genderId == 4 && product.cathegoryId == 4;
+        } else if (filter === 'kidclothes') {
+          return product.genderId == 5 && product.cathegoryId == 2;
+        } else if (filter === 'kidshoes') {
+          return product.genderId == 5 && product.cathegoryId == 3;
+        } else if (filter === 'kidaccessories') {
+          return product.genderId == 5 && product.cathegoryId == 4;
+        } else{
+          return true;
+        }
+      });
+      setCatalog(filteredProducts);
+    }
+    else
+      setCatalog(products);
+  }, [searchproducts, filter]);
 
 
     
@@ -101,7 +130,7 @@ const ProductItem = ({ route }) => {
     <SafeAreaView style={styles.container}>
       <Header />
       <View style={styles.filterbox}>
-        <Text style={[globalStyles.defaultText, styles.text]}>{catalog.length} результатів</Text>
+        <Text style={[globalStyles.defaultText, styles.text]}>{catalog?catalog.length:0} результатів</Text>
         <Pressable style={[styles.button, styles.buttonShadow]} onPress={()=>navigation.navigate('Filter')}>
           <Text style={[globalStyles.defaultText, styles.buttonText]}>Фільтр</Text>
         </Pressable>

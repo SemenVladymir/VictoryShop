@@ -1,20 +1,33 @@
 // components/Header.js
-import React, {useState } from 'react';
-import { View, Text, StyleSheet,  Pressable, Image } from 'react-native';
+import React, {useState, useEffect, useContext } from 'react';
+import { View, Text, StyleSheet,  Pressable, Image, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import globalStyles from '../../screens/Other/styles';
 import { Icon } from 'react-native-elements';
 //import { Provider as PaperProvider, Menu, Button } from 'react-native-paper';
+import { OrderContext } from '../../store/OrderContext';
+import { AuthContext } from '../../store/AuthContext';
 
-const Header = ({cartCount, onlyLOGO }) => {
+const Header = ({ onlyLOGO }) => {
   const navigation = useNavigation();
+  const { actualOrders } = useContext(OrderContext);
+  const { refreshToken } = useContext(AuthContext);
 
   const [visible, setVisible] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
 
+  useEffect(() => {
+    if (actualOrders)
+      setCartCount(actualOrders.length);
+    else
+      setCartCount(0);
+  }, [actualOrders, refreshToken]);
+
 
   return (
+    <SafeAreaView style={{marginTop: 45}}>
       <View style={!onlyLOGO ? styles.header : styles.headerwithoutlogo}>
       <View style={styles.logoContainer}>
       <Pressable onPress={() => navigation.navigate('Favorites')}>
@@ -54,7 +67,8 @@ const Header = ({cartCount, onlyLOGO }) => {
 
         </View>
       ):(<Text></Text>)}
-    </View>
+      </View>
+    </SafeAreaView>
   );
 };
 

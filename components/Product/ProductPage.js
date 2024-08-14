@@ -6,12 +6,16 @@ import { ProductContext } from '../../store/ProductContext';
 import { Icon } from 'react-native-elements';
 import Product from './Product';
 import { addNewData } from '../../services/AsyncStorageUtil';
+import { OrderContext } from '../../store/OrderContext';
+import { useNavigation } from '@react-navigation/native';
 
 
-export default function ProductPage({ navigation, route }) {
-  const { products, countries, colors, brands } = useContext(ProductContext);
+export default function ProductPage({ route }) {
+  const navigation = useNavigation();
+  const { products, countries, colors, brands, genders, discounts } = useContext(ProductContext);
+  const { saveNewOrder } = useContext(OrderContext);
   const formatNumber = (number) => { return number.toLocaleString('uk-UA'); };
-  const { product, gender, discount } = route.params;
+  const { product } = route.params;
   const [selectedImage, setSelectedImage] = useState('');
   const [selectedSizeId, setSelectedSizeId] = useState('');
   const sameproducts = products.filter(e => e.subcathegoryId === product.subcathegoryId && e.genderId === product.genderId && e.id !== product.id);
@@ -32,10 +36,10 @@ export default function ProductPage({ navigation, route }) {
     console.log('Add to Favorite');
   };
 
-  const handleCart = () => {
-    // Implement the navigation to home screen here
-    // navigation.navigate('Main');
+  const handleCart = (item) => {
+    saveNewOrder(item.id);
     console.log('Go to Cart');
+    navigation.navigate('Cart');
   };
 
   const getCountry = (product) => {
@@ -50,29 +54,39 @@ export default function ProductPage({ navigation, route }) {
     if (brands.find(e => e.id == product.brandId))
       return brands.find(e => e.id == product.brandId).name;
   };
+  const getGender = (product) => {
+    if (genders.find(e => e.id == product.genderId))
+      return genders.find(e => e.id == product.genderId).name;
+  };
+  const getDiscount = (product) => {
+    if (discounts.find(e => e.id == product.discountId))
+      return discounts.find(e => e.id == product.discountId).percent;
+  };
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header cartCount={2} onlyLOGO={false}/>
+      <Header />
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
       
       <View style={{flex: 1, flexDirection: 'column', marginHorizontal: 10, justifyContent: 'center', alignItems: 'center'}}>
         <Text style={[globalStyles.defaultText, styles.productTitle]}>{product.name}</Text>
-        <Text style={[globalStyles.defaultText, styles.productSubtitle]}>{gender}</Text>
+        <Text style={[globalStyles.defaultText, styles.productSubtitle]}>{getGender(product)}</Text>
               
         <View style={styles.priceContainer}>
-        {discount > 0 ? <>
+        {getDiscount(product) > 0 ? <>
               <Text style={[globalStyles.boldText, styles.newPrice]}>{formatNumber(product.price)} грн  </Text>
               <Text>          </Text>
-          <Text style={[globalStyles.defaultText, styles.oldPrice]}>{formatNumber(product.price/(100 - discount)*100)} грн</Text> 
+          <Text style={[globalStyles.defaultText, styles.oldPrice]}>{formatNumber(product.price/(100 - getDiscount(product))*100)} грн</Text> 
         </> :
             <Text style={[globalStyles.boldText, styles.Price]}>{formatNumber(product.price)} грн</Text>
         }
         </View>
           
           <View style={{ height: 300, width: '100%', margin: 0, padding: 0, justifyContent: 'center', alignItems: 'center', borderRadius: 25, overflow: 'hidden', position: 'relative' }}>
-          <Image source={{ uri: selectedImage }} style={styles.productImage} />
-          {discount > 0 ? <Image source={require('../../assets/images/Discount.png')} style={styles.discountImage}/> : null}
+            {selectedImage ? <Image source={{ uri: selectedImage }} style={styles.productImage} />
+              :
+            <Image source={require('../../assets/images/No_Image.jpg')} style={styles.productImage} />}
+          {getDiscount(product) > 0 ? <Image source={require('../../assets/images/Discount.png')} style={styles.discountImage}/> : null}
           </View>
 
               {/* <View style={styles.navigation}>
@@ -86,7 +100,9 @@ export default function ProductPage({ navigation, route }) {
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
         {product.photos.map((photo, index) => (
           <Pressable key={index} onPress={() => setSelectedImage(photo.url)}>
-            <Image source={{ uri: photo.url }} style={styles.thumbnail} />
+            {photo.url ? <Image source={{ uri: photo.url }} style={styles.thumbnail} />
+              :
+            <Image source={require('../../assets/images/No_Image.jpg')} style={styles.thumbnail} />}
           </Pressable>
         ))}
           </ScrollView>
@@ -116,7 +132,7 @@ export default function ProductPage({ navigation, route }) {
             <Text style={[globalStyles.defaultText, styles.buttonText]}>Обраний  </Text>
             <Icon name="favorite-border" size={20} color="#000"/>
             </Pressable>
-            <Pressable style={[styles.buttonShadow, styles.buttonCart]} onPress={handleCart}>
+            <Pressable style={[styles.buttonShadow, styles.buttonCart]} onPress={()=>handleCart(product)}>
                 <Text style={[globalStyles.defaultText, styles.buttonTextHome]}>Додати в кошик</Text>
             </Pressable>
         </View>

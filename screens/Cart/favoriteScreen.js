@@ -36,17 +36,27 @@ export default function FavoritesScreen({ navigation }) {
 
 
   useEffect(() => {
-    const favoritesId = getData('Favorites');
-    if (favoritesId.length > 0) {
-      setFavorites(products.filter(product => favoritesId.includes(product.id)));
-    }
+    getData('Favorites').then(favorites=>{
+      // console.log('Favorites from AsyncStorage - '+favorites);
+      if (favorites.length > 0) {
+        const tmp = products.filter(product => favorites.includes(product.id));
+        // console.log('List of products - '+products);
+        // console.log('Favorites from products - '+tmp);
+        setFavorites(tmp);
+      } else{
+        setFavorites(null);
+      }
+    }).catch(error => {
+      console.error('Error loading favorites: ', error);
+    });
+    
   }, []);
 
   const renderItem = ({ item }) => (
-    <Pressable style={styles.item} onPress={() => navigation.navigate('ProductPage')}>
+    <Pressable style={styles.item} onPress={() => navigation.navigate('ProductPage', {product: item})}>
 
       <View style={styles.imagebox}>
-        <Image source={{ uri: item.image }} style={styles.image} />
+        <Image source={{ uri: item.photos[0].url }} style={styles.image} />
         {item.discount ? <Image source={require('../../assets/images/Discount.png')} style={styles.discountImage}/> : null}
       </View>
 

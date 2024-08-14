@@ -102,7 +102,7 @@ class API {
       {
           response = await fetch(url);
       }
-    if (!response.ok) {
+    if (!response) {
       throw new Error('Network response was not ok');
     }
     return response.json(); 
@@ -213,7 +213,7 @@ class API {
     try {
       const url = `${this.baseUrl}/Auth/GetProfilePhoto`;
       await this.loadTokens();
-      const response = this.get(false, '/Auth/GetProfilePhoto');
+      const response = this.get(true, '/Auth/GetProfilePhoto');
       // const response = await this.fetchWithAuth(url, {
       //     method: 'GET',
       //     headers: this.headers,

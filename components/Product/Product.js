@@ -22,7 +22,7 @@ const ProductItem = ({ item }) => {
   
 
       return (
-          <Pressable style={styles.itemContainer} onPress={() => navigation.navigate('ProductPage', { product: item, gender: gendername(item.genderId), discount: percent(item.discountId) })}>
+          <Pressable style={styles.itemContainer} onPress={() => navigation.navigate('ProductPage', { product: item})}>
             <View style={{ height: 170, width: '100%', margin: 0, padding: 0, justifyContent: 'center', alignItems: 'center', borderRadius: 15, overflow: 'hidden', position: 'relative' }}>
             <Image source={ { uri: item.photos[0].url } ? { uri: item.photos[0].url } : defaultImage} style={styles.itemImage} />
             {percent(item.discountId) > 0 ? <Image source={require('../../assets/images/Discount.png')} style={styles.discountImage} /> : null}

@@ -1,3 +1,5 @@
+import { Alert } from "react-native";
+
 const globalErrorHandler = (error, isFatal) => {
     if (isFatal) {
       console.error('Фатальная ошибка:', error);

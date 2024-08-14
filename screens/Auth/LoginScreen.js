@@ -7,16 +7,15 @@ import globalStyles from '../Other/styles';
 import { useNavigation } from '@react-navigation/native';
 import Header from '../../components/common/header';
 
-export default function Login() {
+export default function Login({ navigation }) {
 
   const [loading, setLoading] = useState(false);
   const [username, setUserName] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [data, setData] = useState([]);
 
   
-  const navigation = useNavigation();
+  // const navigation = useNavigation();
         
   const handleRegister = async () => {
     setLoading(true);
@@ -24,14 +23,8 @@ export default function Login() {
       console.log(`Username - ${username} and password - ${password}`)
       await API.login(username, password);
       //navigation.navigate('Home');
-        console.log("Login OK");
-        const responsdata = await API.get(false, '/Product/GetAllItemsFromUniversalClass?classtype=Status');
-        //console.log(responsdata);
-        setData(responsdata);
-        
-              
-      navigation.navigate('Main');
-      
+        console.log("Login OK"); 
+      navigation.navigate('Main');  
     } catch (err) {
         console.log(`login error: ${err}`);
         setError('Login failed');

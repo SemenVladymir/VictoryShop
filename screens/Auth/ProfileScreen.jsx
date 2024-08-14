@@ -21,7 +21,8 @@ const Profile = ({ navigation }) => {
   //   if (userphoto) {
   //     setImageUri(userphoto);
   //   }
-  //   setImageUri(null);
+  //   else
+  //     setImageUri(null);
   // }, [userphoto]);
 
   //Получение разрешения для выбора изображения для профиля
@@ -99,32 +100,42 @@ const Profile = ({ navigation }) => {
       <ScrollView style={styles.container}>
       <View style={styles.profileContainer}>
         <Pressable onPress={showImagePickerOptions}>
-            {/* <Image source={{ uri: imageUri }?{ uri: imageUri }: require('../../assets/images/No_Image.jpg')} style={styles.profileImage} /> */}
+            {/* {imageUri ? <Image source={{ uri: imageUri }} style={styles.profileImage} />
+              :
+            <Image source={require('../../assets/images/No_Image.jpg')} style={styles.profileImage} />} */}
           <Text style={[globalStyles.defaultText, styles.changePhotoText]}>Змінити фото</Text>
         </Pressable>
 
-        <View style={[globalStyles.defaultText, styles.inputContainer]}>
-          <Text>Ім'я</Text>
-          <TextInput style={[globalStyles.defaultText, styles.input, styles.borders]} placeholder="Ім'я*" />
+        <View style={styles.inputContainer}>
+            <Text style={[globalStyles.boldText, styles.text]}>Ім'я</Text>
+            {firstname ? <TextInput style={[globalStyles.defaultText, styles.input, styles.borders]} value={ firstname } />
+              :
+              <TextInput style={[globalStyles.defaultText, styles.input, styles.borders]} placeholder="Ім'я*" />}
         </View>
 
-        <View style={[globalStyles.defaultText, styles.inputContainer]}>
-          <Text>Прізвище</Text>
-          <TextInput style={[globalStyles.defaultText, styles.input, styles.borders]} placeholder="Прізвище" />
+        <View style={styles.inputContainer}>
+            <Text style={[globalStyles.boldText, styles.text]}>Прізвище</Text>
+            {lastname ? <TextInput style={[globalStyles.defaultText, styles.input, styles.borders]} value={ lastname } />
+              :
+              <TextInput style={[globalStyles.defaultText, styles.input, styles.borders]} placeholder="Прізвище" />}
         </View>
 
-        <View style={[globalStyles.defaultText, styles.inputContainer]}>
-          <Text>Номер телефону</Text>
-          <View style={[styles.inputWithIcon, styles.borders]}>
-            <TextInput style={[globalStyles.defaultText, styles.input]} placeholder="+380" />
+        <View style={styles.inputContainer}>
+            <Text style={[globalStyles.boldText, styles.text]}>Номер телефону</Text>
+            <View style={[styles.inputWithIcon, styles.borders]}>
+              {phonenumber ? <TextInput style={[globalStyles.defaultText, styles.input]} value={phonenumber} />
+                :
+                <TextInput style={[globalStyles.defaultText, styles.input]} placeholder="+380" />}
             <Icon name="edit" size={20} color="#000" backgroundColor='#F5F5F5'/>
           </View>
         </View>
 
-        <View style={[globalStyles.defaultText, styles.inputContainer]}>
-          <Text>Ел. пошта</Text>
-          <View style={[styles.inputWithIcon, styles.borders]}>
-            <TextInput style={[globalStyles.defaultText, styles.input]} placeholder="--------" />
+        <View style={styles.inputContainer}>
+            <Text style={[globalStyles.boldText, styles.text]}>Ел. пошта</Text>
+            <View style={[styles.inputWithIcon, styles.borders]}>
+              {email ? <TextInput style={[globalStyles.defaultText, styles.input]} value={email} />
+                :
+                <TextInput style={[globalStyles.defaultText, styles.input]} placeholder="--------" />}
             <Icon name="edit" size={20} color="#000" backgroundColor='#F5F5F5'/>
           </View>
         </View>
@@ -204,6 +215,9 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#FFF',
     fontSize: 16,
+  },
+  label: {
+
   },
 });
 

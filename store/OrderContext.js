@@ -1,7 +1,8 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useContext } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import API from '../services/api';
 import { Order, Status } from '../components/Cart/OrderClass'
+import { AuthContext } from './AuthContext';
 
 const OrderContext = createContext();
 
@@ -46,17 +47,32 @@ const getStatus = async (orderId) => {
     // console.log('Photos - '+response.data);
     return response.map(item => new Size(item.Id, item.InternationalName, item.LocalName));
   } catch (error) {
-    console.error('Error fetchin sazes - ' +error);
+    console.error('Error fetchin getting status by orderId (OrderContext) 49 - ' +error);
     return [];
   }
 };
 
 //Функция получения заказов со статусом в ожидании (добаленные в корзину)
-const getActualOrder = async () => {
+const getActualOrders = async () => {
     try {
-      const response = await API.get(true, '/Product/GetOrdersByUserIdAndStatusId2');
-      // console.log('Photos - '+response.data);
-      return response.map(Data => new Order(Data.Id, Data.ProductId, Data.UserId, Data.StatusId, Data.Amount));
+        const response = await API.get(true, '/Order/GetOrdersByUserIdAndStatusId2');
+        if (response) {
+            // console.log('Actual Orders - ' + response.data);
+            return response.map(Data => new Order(Data.Id, Data.ProductId, Data.UserId, Data.StatusId, Data.Amount)) || [];
+        }
+        return [];
+        } catch (error) {
+        console.error('Error fetchin actual orders by statusId=2 (OrderContext) 64 - ' +error);
+        return [];
+    }
+  };
+
+  //Функция сохранения заказа в базе данных
+const saveNewOrder = async (productId) => {
+    try {
+        const order = new Order(0, productId, '1', 2, 1);
+        const response = await API.post('/Order/CreateOrder', order);
+        // console.log('New Order - '+response);
     } catch (error) {
       console.error('Error fetchin sazes - ' +error);
       return [];
@@ -64,12 +80,12 @@ const getActualOrder = async () => {
   };
 
 
-
-// Функция для извлечения массива объектов сложных классов из AsyncStorage или базы данных 
-const loadArray = async (update = true) => {
+// Функция для извлечения массива всех заказов клиента из базы данных 
+const getAllOrders = async (update = true) => {
   var ArrayData;
   try {
       ArrayData = await API.get(true, '/Order/GetAllOrdersByUser');
+      // console.log('ArrayData getAllOrders - '+ArrayData);
       if (ArrayData)
         return ArrayData.map(Data => new Order(Data.Id, Data.ProductId, Data.UserId, Data.StatusId, Data.Amount));
       else
@@ -80,11 +96,28 @@ const loadArray = async (update = true) => {
   }
 };
 
+//Функция изменения статуса заказа в базе данных
+const changeOrder = async (orderId, statusId, amount) => {
+    try {
+        const orders = getAllOrders();
+        const data = orders.find(item => item.id == orderId);
+        if (data) {
+            const order = new Order(data.id, data.productId, 'userid', statusId, amount);
+            const response = await API.post('/Order/UpdateOrderWithId' + orderId, order);
+            // console.log('New Order - ' + response);
+        }
+    } catch (error) {
+      console.error('Error fetchin sazes - ' +error);
+      return [];
+    }
+  };
+
 
 const OrderProvider = ({ children }) => {
   const [orders, setOrders] = useState([]);
   const [statuses, setStatuses] = useState([]);
-
+  const [actualOrders, setActualOrders] = useState([]);
+  const { userEntered, refreshToken } = useContext(AuthContext);
 
  //Для индикации загрузки данных
   const [loading, setLoading] = useState(true);
@@ -94,17 +127,19 @@ const OrderProvider = ({ children }) => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [orderList, statusList] = await Promise.all([
-        loadArray(),
-        fetchData('/Order/GetAllStatuses', 'Status', Status),,
-      ]);
+        if (userEntered) {
+          const [orderList, statusList, actualOrderList] = await Promise.all([
+            getAllOrders(),
+            fetchData('/Order/GetAllStatuses', 'Status', Status),
+            getActualOrders(),
+          ]);
 
-        setOrders(orderList);
-        saveArrayToAsyncStorage('Order', orders);
-        setStatuses(statusList);
-        saveArrayToAsyncStorage('Status', statuses);
-
-
+          setOrders(orderList);
+          saveArrayToAsyncStorage('Order', orders);
+          setStatuses(statusList);
+          saveArrayToAsyncStorage('Status', statuses);
+          setActualOrders(actualOrderList);
+        }
       } catch (error) {
         console.error('Error loading product data', error);
       } finally {
@@ -113,11 +148,11 @@ const OrderProvider = ({ children }) => {
 
     }
     loadData();
-  }, []);
+  }, [userEntered, refreshToken]);
 
 
   return (
-    <OrderContext.Provider value={{ orders, statuses }}>
+    <OrderContext.Provider value={{ orders, statuses, actualOrders, saveNewOrder, changeOrder, getActualOrders, getAllOrders }}>
       {children}
     </OrderContext.Provider>
   );

@@ -1,20 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { View, Text, Image, Pressable, TextInput, StyleSheet, ScrollView, SafeAreaView, Alert } from 'react-native';
 import globalStyles from '../../screens/Other/styles';
 import Header from '../../components/common/header';
 import { useNavigation } from '@react-navigation/native';
+import { OrderContext } from '../../store/OrderContext';
+import { ProductContext } from '../../store/ProductContext';
+
 
 // Используем локаль 'uk-UA' для форматирования цифр с разделение на порядки по-украински
 const formatNumber = (number) => { return number.toLocaleString('uk-UA'); };
 
 
 const CartItem = ({ item, onIncrease, onDecrease, onRemove }) => {
-  // const navigation = useNavigation();
-
+  const navigation = useNavigation();
   return (
       <View style={styles.cartItem}>
-        <Pressable onPress={() => navigation.navigate('ProductPage')}>
-          <Image source={item.image} style={styles.image} />
+      <Pressable onPress={() => navigation.navigate('ProductPage', {product: item })}>
+        <Image source={{ uri: item.photos[0].url }} style={styles.image} />
           {item.discount ? <Image source={require('../../assets/images/Discount.png')} style={styles.discountImage}/> : null}
         </Pressable>
       
@@ -51,65 +53,88 @@ const CartItem = ({ item, onIncrease, onDecrease, onRemove }) => {
   );
 };
 
-export default function CartScreen({ navigation }) {
-  // const navigation = useNavigation();
 
-  const [cart, setCart] = useState([
-      {
-          id: 1,
-          name: 'ZERØGRAND Running Shoes',
-          price: 7200,
-          quantity: 1,
-          image: require('../../assets/images/ProductImage.png'),
-          cathegory: 'для чоловіків',
-          discount: 20,
-      },
-      {
-          id: 2,
-          name: 'Футболка Puma Essentials+',
-          price: 990,
-          quantity: 1,
-          image: require('../../assets/images/ProductImage1.png'),
-          cathegory: 'для жінок',
-          discount: null,
-      },
-      {
-          id: 3,
-          name: 'Худі Diadora 502179481',
-          price: 5202,
-          quantity: 1,
-          image: require('../../assets/images/ProductImage1.png'),
-          cathegory: 'для жінок',
-          discount: null,
-      },
-      {
-          id: 4,
-          name: 'Сумка для взуття LiveUP 23x27 см',
-          price: 126,
-          quantity: 1,
-          image: require('../../assets/images/ProductImage.png'),
-          cathegory: 'для жінок',
-          discount: 20,
-    },
-    {
-      id: 5,
-      name: 'Сумка для взуття LiveUP 23x27 см',
-      price: 126,
-      quantity: 1,
-      image: require('../../assets/images/ProductImage.png'),
-      cathegory: 'для жінок',
-      discount: null,
-    },
-    {
-      id: 6,
-      name: 'Сумка для взуття LiveUP 23x27 см',
-      price: 126,
-      quantity: 1,
-      image: require('../../assets/images/ProductImage.png'),
-      cathegory: 'для жінок',
-      discount: 20,
-  },
-  ]);
+export default function CartScreen({ navigation }) {
+  const { actualOrders, getActualOrders } = useContext(OrderContext);
+  const { products } = useContext(ProductContext);
+  const [cart, setCart] = useState([]);
+
+  useEffect(() => {
+    getActualOrders().then(orders => {
+    if (Array.isArray(orders) && orders.length > 0) {
+      // console.table('Count actual orders in cart - ' + orders.length);
+      const tmp = orders.filter(item => item.statusId == 2);
+      if (tmp && products) {
+        const productIds = tmp.map(item => item.productId);
+        const filteredProducts = products.filter(product => productIds.includes(product.id));
+        setCart(filteredProducts);
+        // console.table('filtered products - ', filteredProducts);
+      }
+    } else {
+      setCart(null);
+    }
+  })
+  .catch(error => {
+    console.error('Error loading orders:', error);
+  });
+  }, [actualOrders]);
+
+  // const [cart, setCart] = useState([
+  //     {
+  //         id: 1,
+  //         name: 'ZERØGRAND Running Shoes',
+  //         price: 7200,
+  //         quantity: 1,
+  //         image: require('../../assets/images/ProductImage.png'),
+  //         cathegory: 'для чоловіків',
+  //         discount: 20,
+  //     },
+  //     {
+  //         id: 2,
+  //         name: 'Футболка Puma Essentials+',
+  //         price: 990,
+  //         quantity: 1,
+  //         image: require('../../assets/images/ProductImage1.png'),
+  //         cathegory: 'для жінок',
+  //         discount: null,
+  //     },
+  //     {
+  //         id: 3,
+  //         name: 'Худі Diadora 502179481',
+  //         price: 5202,
+  //         quantity: 1,
+  //         image: require('../../assets/images/ProductImage1.png'),
+  //         cathegory: 'для жінок',
+  //         discount: null,
+  //     },
+  //     {
+  //         id: 4,
+  //         name: 'Сумка для взуття LiveUP 23x27 см',
+  //         price: 126,
+  //         quantity: 1,
+  //         image: require('../../assets/images/ProductImage.png'),
+  //         cathegory: 'для жінок',
+  //         discount: 20,
+  //   },
+  //   {
+  //     id: 5,
+  //     name: 'Сумка для взуття LiveUP 23x27 см',
+  //     price: 126,
+  //     quantity: 1,
+  //     image: require('../../assets/images/ProductImage.png'),
+  //     cathegory: 'для жінок',
+  //     discount: null,
+  //   },
+  //   {
+  //     id: 6,
+  //     name: 'Сумка для взуття LiveUP 23x27 см',
+  //     price: 126,
+  //     quantity: 1,
+  //     image: require('../../assets/images/ProductImage.png'),
+  //     cathegory: 'для жінок',
+  //     discount: 20,
+  // },
+  // ]);
   const [promoCode, setPromoCode] = useState('');
   const [hasPromocode, sethasPromocode] = useState(false);
 
@@ -146,15 +171,17 @@ export default function CartScreen({ navigation }) {
 
   const handleCatalog = () => {
     // Implement the navigation to home screen here
-    navigation.navigate('ProductItem');
+    navigation.navigate('Catalog');
   };
 
   const totalAmount = cart.reduce((total, item) => total + item.price * item.quantity, 0);
   const totalQuantity = cart.reduce((total, item) => total + item.quantity, 0);
 
+
   return (
       <SafeAreaView style={styles.container}>
-      <Header cartCount={totalQuantity}/>
+      {/* <Header cartCount={totalQuantity}/> */}
+      <Header />
       {cart.length ? <>
         <View style={styles.title}>
             <Text style={[globalStyles.boldText, styles.titletext]}>Кошик</Text>
@@ -174,7 +201,7 @@ export default function CartScreen({ navigation }) {
             <Text style={[globalStyles.boldText, styles.totalText]}>Кількість товарів: {formatNumber(totalQuantity)} шт.</Text>
             <Text style={[globalStyles.boldText, styles.totalText]}>Вартість товарів: {formatNumber(totalAmount)} грн.</Text>
           </View>
-          <Pressable style={[styles.buySelectedButton, styles.buttonShadow]} onPress={() => navigation.navigate('Order')}>
+          <Pressable style={[styles.buySelectedButton, styles.buttonShadow]} onPress={() => navigation.navigate('Order', { orderProducts: cart })}>
             <Text style={[globalStyles.defaultText, styles.buttonText]}>Придбати обране</Text>
           </Pressable>
 

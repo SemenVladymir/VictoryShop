@@ -14,6 +14,7 @@ export const AuthProvider = ({ children }) => {
   const [userToken, setUserToken] = useState(null);
   const [refreshToken, setRefreshToken] = useState(null);
   const [hasToken, setHasToken] = useState(false);
+  const [userEntered, setUserEntered] = useState(false);
 
   const [username, setUserName] = useState('');
   const [firstname, setFirstName] = useState('');
@@ -50,25 +51,10 @@ export const AuthProvider = ({ children }) => {
       else {
         // await API.refreshToken();
         console.log('Time is not exit!');
-        // const Data = await API.get(true, '/Auth/GetProfile');
-        // const userProfile =  new User(Data.id, Data.userName, Data.email, Data.roles,
-        //                           Data.firstName, Data.lastName, Data.Birthdate, Data.phoneNumber);
-        // saveData('UserProfile', userProfile);
-        // // console.table(Data);
-        // setUserName(userProfile.login);
-        // setFirstName(userProfile.firstname);
-        // setLastName(userProfile.lastname);
-        // setPhoneNumber(userProfile.phone);
-        // setBirthDate(userProfile.birthdate); 
-        // setEmail(userProfile.email);
-        // const userPhoto = await API.get(true, '/Auth/GetProfilePhoto')
-        // const userPhoto = await API.downloadImage();
-        // saveData('userPhoto', userPhoto);
-        // setUserPhoto(userPhoto);
-        // saveImageToLocalDirectory(userPhoto);
+        
       }
-        setHasToken(true);
-
+      enterUser();
+      setHasToken(true);
     };
     loadToken();
   }, []);
@@ -85,6 +71,32 @@ export const AuthProvider = ({ children }) => {
       await AsyncStorage.removeItem('refreshToken');
       setUserToken(null);
       setRefreshToken(null);
+  };
+
+  const enterUser = async () => {
+    const Data = await API.get(true, '/Auth/GetProfile');
+        console.log('1. User profile data - ' + Data);
+        if (Data) {
+          const userProfile = new User(Data.id, Data.userName, Data.email, Data.roles,
+            Data.firstName, Data.lastName, Data.Birthdate, Data.phoneNumber);
+          saveData('UserProfile', userProfile);
+          // console.table(Data);
+          setUserName(userProfile.login);
+          setFirstName(userProfile.firstname);
+          setLastName(userProfile.lastname);
+          setPhoneNumber(userProfile.phone);
+          setBirthDate(userProfile.birthdate);
+          setEmail(userProfile.email);
+          // const userPhoto = await API.get(true, '/Auth/GetProfilePhoto')
+          // const userPhoto = await API.downloadImage();
+          // saveData('userPhoto', userPhoto);
+          // setUserPhoto(userPhoto);
+          // saveImageToLocalDirectory(userPhoto);
+          setUserEntered(true);
+    }
+        else {
+          setUserEntered(false);
+    }
   };
 
   const saveImageToLocalDirectory = async (uri) => {
@@ -111,8 +123,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{hasToken, saveImageToLocalDirectory, username,
-      firstname, lastname, phonenumber, birthdate, userphoto, email
+    <AuthContext.Provider value={{hasToken, saveImageToLocalDirectory, username, userToken, refreshToken,
+      firstname, lastname, phonenumber, birthdate, userphoto, email, userEntered,
     }}>
       {children}
     </AuthContext.Provider>

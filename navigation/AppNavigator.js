@@ -5,9 +5,9 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 
 import { FontProvider, FontContext } from '../contexts/FontContext';
-import { UserProvider } from '../store/UserContext';
 import { ProductProvider } from '../store/ProductContext';
 import { AuthContext, AuthProvider } from '../store/AuthContext';
+import { OrderProvider } from '../store/OrderContext';
 
 import CustomDrawerContent from '../components/common/CustomDrawerContent'
 import BackHandlerWrapper from '../components/common/BackHandlerWrapper';
@@ -28,7 +28,9 @@ import Favorites from '../screens/Cart/favoriteScreen';
 import Cart from '../screens/Cart/cartScreen';
 import Filter from '../screens/Cart/FilterScreen';
 import Order from '../screens/Order/OrderScreen';
-import Auth from '../store/AuthContext';
+import Help from '../screens/Other/HelpScreen';
+import GiftCards from '../screens/Other/GiftCardScreen';
+import { View, StyleSheet } from 'react-native';
 
 
 const Stack = createStackNavigator();
@@ -37,67 +39,82 @@ const Drawer = createDrawerNavigator();
 
 
 const AppContent = () => {
-  const { hasToken } = useContext(AuthContext);
+  const { hasToken, userEntered } = useContext(AuthContext);
   const { fontsLoaded } = useContext(FontContext);
-  if (!hasToken) {
+  if (!hasToken || !fontsLoaded) {
     return null;
   }
 
-  if (!fontsLoaded ) {
-    return null;
-  }
+  const renderScreen = (name, component) => {
+    return (
+      <Drawer.Screen
+        name={name}
+        component={userEntered ? component : EnterNRegistr}
+      />
+    );
+  };
+
+  const styles = StyleSheet.create({
+    drawerContainer: {
+      flex: 1,
+      borderWidth: 10,
+      borderColor: '#4748FF',
+      overflow: 'hidden',
+    },
+  });
 
  
-
-  return (
+return (
     <NavigationContainer>
       <BackHandlerWrapper>
       <Drawer.Navigator
-        // initialRouteName="Main"
-        drawerContent={(props) => <CustomDrawerContent {...props}
-        screenOptions={{
-          drawerPosition: 'right',
-          headerShown: false,
-          drawerStyle:{right:0},
-          drawerActiveBackgrondColor: '#4748FF',
-
-        }}
-        // drawerContentOptions={{activeTintColor: '#e91e63',}}
-        drawerStyle={{width: 140, }}
-        />}>
-        <Drawer.Screen name="Main" component={Main}/>
-        <Drawer.Screen name="Registration" component={Registration} />
-        <Drawer.Screen name="Login" component={Login} />
-        <Drawer.Screen name="Home" component={Home} />
-        <Drawer.Screen name="Enter" component={EnterNRegistr} />
-        <Drawer.Screen name="Profile" component={Profile} />
-        <Drawer.Screen name="Error" component={Error} />
-        <Drawer.Screen name="RegistrationNValidation" component={RegistrationNValidation} />
-        <Drawer.Screen name="Search" component={Search} />
-        <Drawer.Screen name="Catalog" component={Catalog} />
-        <Drawer.Screen name="ProductPage" component={ProductPage} />
-        {/* <Drawer.Screen name="StoreLocator" component={StoreLocator} /> */}
-        <Drawer.Screen name="Favorites" component={Favorites} />
-        <Drawer.Screen name="Cart" component={Cart} />
-        <Drawer.Screen name="Filter" component={Filter} />
-        <Drawer.Screen name="Order" component={Order} />
-        {/* <Drawer.Screen name="Aurh" component={Auth} /> */}
+        drawerContent={(props) => (
+          <View style={styles.drawerContainer}>
+            <CustomDrawerContent {...props} />
+          </View>
+          )}
+          screenOptions={{
+            drawerPosition: 'right',
+            headerShown: false,
+            drawerStyle: { right: 0, width: 320 },
+            drawerActiveBackgrondColor: '#4748FF',
+            gestureEnabled: false,
+          }}
+        >
+          <Drawer.Screen name="Main" component={Main} />
+          <Drawer.Screen name="Registration" component={Registration} />
+          <Drawer.Screen name="Login" component={Login} />
+          <Drawer.Screen name="Home" component={Home} />
+          <Drawer.Screen name="Enter" component={EnterNRegistr} />
+          <Drawer.Screen name="Profile" component={Profile} />
+          <Drawer.Screen name="Error" component={Error} />
+          <Drawer.Screen name="RegistrationNValidation" component={RegistrationNValidation} />
+          <Drawer.Screen name="Search" component={Search} />
+          <Drawer.Screen name="Catalog" component={Catalog} />
+          <Drawer.Screen name="ProductPage" component={ProductPage} />
+          <Drawer.Screen name="Favorites" component={Favorites} />
+          {renderScreen("Cart", Cart)}
+          <Drawer.Screen name="Filter" component={Filter} />
+        <Drawer.Screen name="Help" component={Help} />
+        <Drawer.Screen name="GiftCards" component={GiftCards} />
+          {renderScreen("Order", Order)}
         </Drawer.Navigator>
-        </BackHandlerWrapper>
+      </BackHandlerWrapper>
     </NavigationContainer>
   );
-}
+};
 
 export default function AppNavigator() {
   return (
     <AuthProvider>
-      <UserProvider>
         <ProductProvider>
-          <FontProvider>
-            <AppContent />
-          </FontProvider>
+          <OrderProvider>
+            <FontProvider>
+              <AppContent />
+            </FontProvider>
+          </OrderProvider>
         </ProductProvider>
-      </UserProvider>
     </AuthProvider>
   );
 }
+
