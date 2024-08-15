@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import API from '../services/api';
-import { Order, Status } from '../components/Cart/OrderClass'
+import { Order, Status, Delivery, Payment } from '../components/Cart/OrderClass'
 import { AuthContext } from './AuthContext';
 
 const OrderContext = createContext();
@@ -97,21 +97,48 @@ const getAllOrders = async (update = true) => {
 };
 
 //Функция изменения статуса заказа в базе данных
-const changeOrder = async (orderId, statusId, amount) => {
+const changeOrder = async (order, statusId, amount) => {
     try {
-        const orders = getAllOrders();
-        const data = orders.find(item => item.id == orderId);
-        if (data) {
-            const order = new Order(data.id, data.productId, 'userid', statusId, amount);
-            const response = await API.post('/Order/UpdateOrderWithId' + orderId, order);
+        // const orders = getAllOrders();
+        // const data = orders.find(item => item.id == orderId);
+      if (order) {
+        order.statusId = statusId;
+        order.amount = amount;
+            // const order = new Order(data.id, data.productId, 'userid', statusId, amount);
+            const response = await API.post('/Order/UpdateOrder', order);
             // console.log('New Order - ' + response);
         }
     } catch (error) {
-      console.error('Error fetchin sazes - ' +error);
+      console.error('Error fetchin save changed order - ' +error);
       return [];
     }
-  };
+};
+  
+//Функция создания ордера на поставку товара в базе данных
+const createDelivery = async (OrderId, StatusId=2, Address, Additionally) => {
+  try {
+    if (OrderId && Address) {
+          const delivery = new Delivery(0, 'userid', StatusId, OrderId, Address, Additionally, new Date());
+          const response = await API.post('/Delivery/CreateDelivery', delivery);
+      }
+  } catch (error) {
+    console.error('Error fetchin save changed order - ' + error);
+    return [];
+  }
+};
 
+//Функция создания ордера на оплату в базе данных
+const createPayment = async (OrderId, Summ, StatusId=2, Amount) => {
+  try {
+    if (OrderId && Summ) {
+          const payment = new Payment(0, OrderId, Summ, StatusId, Amount);
+          const response = await API.post('/Payment/CreatePayment', payment);
+      }
+  } catch (error) {
+    console.error('Error fetchin save changed order - ' + error);
+    return [];
+  }
+};
 
 const OrderProvider = ({ children }) => {
   const [orders, setOrders] = useState([]);
@@ -152,7 +179,10 @@ const OrderProvider = ({ children }) => {
 
 
   return (
-    <OrderContext.Provider value={{ orders, statuses, actualOrders, saveNewOrder, changeOrder, getActualOrders, getAllOrders }}>
+    <OrderContext.Provider value={{
+      orders, statuses, actualOrders, saveNewOrder, createDelivery, createPayment,
+      changeOrder, getActualOrders, getAllOrders, setActualOrders,
+    }}>
       {children}
     </OrderContext.Provider>
   );

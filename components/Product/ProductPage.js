@@ -39,7 +39,7 @@ export default function ProductPage({ route }) {
   const handleCart = (item) => {
     saveNewOrder(item.id);
     console.log('Go to Cart');
-    navigation.navigate('Cart');
+    // navigation.navigate('Cart');
   };
 
   const getCountry = (product) => {
@@ -82,7 +82,7 @@ export default function ProductPage({ route }) {
         }
         </View>
           
-          <View style={{ height: 300, width: '100%', margin: 0, padding: 0, justifyContent: 'center', alignItems: 'center', borderRadius: 25, overflow: 'hidden', position: 'relative' }}>
+          <View style={{ height: 370, width: '100%', margin: 0, padding: 0, justifyContent: 'center', alignItems: 'center', borderRadius: 25, overflow: 'hidden', position: 'relative' }}>
             {selectedImage ? <Image source={{ uri: selectedImage }} style={styles.productImage} />
               :
             <Image source={require('../../assets/images/No_Image.jpg')} style={styles.productImage} />}
@@ -116,7 +116,7 @@ export default function ProductPage({ route }) {
               onPress={() => handlePress(size.id)}
               style={[
                 styles.sizeitem,
-                selectedSizeId === size.id && styles.selectedSizeItem, // Применяем стиль для выбранного элемента
+                selectedSizeId === size.id && styles.selectedSizeItem,
               ]}
             >
               <Text style={{ color: selectedSizeId === size.id ? '#fff' : '#000' }}>
@@ -207,8 +207,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
     productImage: {
-      width: 280,
-      height: 300,
+      width: 370,
+      height: 370,
       resizeMode: 'cover',
       borderRadius: 5,
     },
@@ -216,8 +216,8 @@ const styles = StyleSheet.create({
       position: 'absolute',
       top: 10,
       left: 10,
-      width: 40,
-      height: 40,
+      width: 50,
+      height: 50,
       resizeMode: 'contain',
     },
   navigation: {

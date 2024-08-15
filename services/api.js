@@ -87,7 +87,8 @@ class API {
 
   async get(auth, endpoint) {
     // console.log(endpoint);
-      const url = `${this.baseUrl}${endpoint}`;
+    const url = `${this.baseUrl}${endpoint}`;
+    // console.log('API go to '+url);
       var response = Response.ok;
       if (auth)
       {
@@ -96,13 +97,14 @@ class API {
               method: 'GET',
               headers: this.headers,
           });
-          console.log(response);
+          // console.log('Response from API.get with Auth '+response);
       }
       else
       {
           response = await fetch(url);
       }
     if (!response) {
+      console.log('Response from API.get if error '+response);
       throw new Error('Network response was not ok');
     }
     return response.json(); 
@@ -133,10 +135,6 @@ class API {
     if (!response.ok) {
       throw new Error('Failed to register: ' + response.body);
     }
-
-    // this.login(username, password);
-    // const data = await response.json();
-    // await this.setTokens(data.token, data.refreshToken);
   }
 
   async login(username, password) {
@@ -156,10 +154,24 @@ class API {
       console.log('Token after Login - '+data.token);
       console.log('RefreshToken after Login - '+data.refreshToken);
       await this.setTokens(data.token, data.refreshToken);
+      return response;
     }
     catch (err)
     {
       console.log(err);
+    }
+  }
+
+  async updateprofile(Username, Password, Email, Role = 'User', BirthDate, FirstName, LastName, PhoneNumber) {
+    console.log(FirstName);
+    const response = await fetch(`${this.baseUrl}/Auth/UpdateProfile`, {
+      method: 'POST',
+      headers: this.headers,
+      body: JSON.stringify({Username,  Email, Password, FirstName, LastName,  BirthDate, Role, PhoneNumber }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to profile updated: ' + response.body);
     }
   }
 
@@ -170,40 +182,40 @@ class API {
     this.headers['Authorization'] = null;
   }
 
-  async uploadImage (imageUri) {
+  async uploadImage(imageUri) {
     if (!imageUri) return;
-
+  
     // Подготовка данных для отправки
     let localUri = imageUri;
     let filename = localUri.split('/').pop();
-
+  
     let match = /\.(\w+)$/.exec(filename);
     let type = match ? `image/${match[1]}` : `image`;
-
+  
     let formData = new FormData();
+    console.log('Image data');
     formData.append('file', { uri: localUri, name: filename, type });
-
+  
     try {
-      const url = `${this.baseUrl}$/Auth/UploadProfilePhoto`;
-        await this.loadTokens();
-          response = await this.fetchWithAuth(url, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-            body: formData,
-          });
-
-      const responseData = await response.json();
-      console.log('Upload successful:', responseData);
-
-      // Сохранение изображения в файловую систему устройства
-      // const fileUri = `${FileSystem.documentDirectory}${filename}`;
-      // await FileSystem.copyAsync({
-      //   from: imageUri,
-      //   to: fileUri,
-      // });
-
+      const url = `${this.baseUrl}/Auth/UploadProfilePhoto`;
+      await this.loadTokens();
+      const response = await this.fetchWithAuth(url, {
+        method: 'POST',
+        headers: {
+          ...this.headers,
+          'Content-Type': 'multipart/form-data',
+        },
+        body: formData,
+      });
+  
+      // Проверка успешности запроса
+      if (response.ok) {
+        const responseData = await response.json();
+        console.log('Upload successful:', responseData);
+      } else {
+        console.error('Upload failed with status:', response.status);
+      }
+  
     } catch (error) {
       console.error('Error uploading image:', error);
     }
@@ -212,42 +224,38 @@ class API {
   async downloadImage() {
     try {
       const url = `${this.baseUrl}/Auth/GetProfilePhoto`;
-      await this.loadTokens();
-      const response = this.get(true, '/Auth/GetProfilePhoto');
-      // const response = await this.fetchWithAuth(url, {
-      //     method: 'GET',
-      //     headers: this.headers,
-      // });
-      
-      console.log('1. response - '+response);
-      // Проверяем успешность запроса
+      const response = await this.fetchWithAuth(url, {
+          method: 'GET',
+          headers: this.headers,
+      });
+
       if (!response.ok) {
         throw new Error('Network response was not ok');
       } 
-  
-      // Получаем blob данных изображения
+
       const blob = await response.blob();
-      console.log('2. blob - '+blob);
-      // Преобразуем blob в Base64 строку
-      const reader = new FileReader();
-      reader.readAsDataURL(blob);
-      reader.onloadend = async () => {
-        const base64data = reader.result.split(',')[1]; // Убираем префикс 'data:...' из Base64 строки
-  
-        // Генерируем путь для сохранения файла
-        const fileUri = `${FileSystem.documentDirectory}downloaded_image.jpg`;
-        console.log('3. fileUri - '+fileUri);
-        // Сохраняем изображение в файловую систему устройства
-        await FileSystem.writeAsStringAsync(fileUri, base64data, {
-          encoding: FileSystem.EncodingType.Base64,
-        });
-        console.log('Image saved to:', fileUri);
-        return fileUri;
-      };
+
+      // Преобразуем blob в Base64 строку асинхронно
+      const base64data = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+
+      const fileUri = `${FileSystem.documentDirectory}assets/images/Profilephoto.png`;
+
+      await FileSystem.writeAsStringAsync(fileUri, base64data, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      console.log('Image saved to:', fileUri);
+      return fileUri;
+
     } catch (error) {
       console.error('Error downloading image:', error);
     }
-  };
+};
 
 
   // Другие методы API (PUT, DELETE и т.д.) по мере необходимости

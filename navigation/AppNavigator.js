@@ -13,19 +13,19 @@ import CustomDrawerContent from '../components/common/CustomDrawerContent'
 import BackHandlerWrapper from '../components/common/BackHandlerWrapper';
 
 import Login from '../screens/Auth/LoginScreen'
-import Home from '../screens/Home/home'
+import Home from '../screens/Home/HomeScreen'
 import Profile from '../screens/Auth/ProfileScreen'
 import EnterNRegistr from '../screens/Auth/enternregistr'
-import Main from '../screens/Home/main'
+import Main from '../screens/Home/MainScreen'
 import Error from '../screens/Other/ErrorScreen';
 import Registration from '../screens/Auth/registration';
 import RegistrationNValidation from '../screens/Auth/RegistrationScreen';
 import Search from '../screens/Other/SearchScreen';
 import Catalog from '../screens/Product/CatalogScreen';
 import ProductPage from '../components/Product/ProductPage';
-import StoreLocator from '../screens/Other/storeLocator';
-import Favorites from '../screens/Cart/favoriteScreen';
-import Cart from '../screens/Cart/cartScreen';
+import StoreLocator from '../screens/Other/StoreLocator';
+import Favorites from '../screens/Cart/FavoriteScreen';
+import Cart from '../screens/Cart/CartScreen';
 import Filter from '../screens/Cart/FilterScreen';
 import Order from '../screens/Order/OrderScreen';
 import Help from '../screens/Other/HelpScreen';
@@ -92,11 +92,12 @@ return (
           <Drawer.Screen name="Search" component={Search} />
           <Drawer.Screen name="Catalog" component={Catalog} />
           <Drawer.Screen name="ProductPage" component={ProductPage} />
+          <Drawer.Screen name="StoreLocator" component={StoreLocator} />
           <Drawer.Screen name="Favorites" component={Favorites} />
           {renderScreen("Cart", Cart)}
           <Drawer.Screen name="Filter" component={Filter} />
-        <Drawer.Screen name="Help" component={Help} />
-        <Drawer.Screen name="GiftCards" component={GiftCards} />
+          <Drawer.Screen name="Help" component={Help} />
+          <Drawer.Screen name="GiftCards" component={GiftCards} />
           {renderScreen("Order", Order)}
         </Drawer.Navigator>
       </BackHandlerWrapper>

@@ -8,7 +8,7 @@ import Icon from 'react-native-vector-icons/AntDesign';
 
 
 const CustomDrawerContent = (props) => {
-  const { username, firstname, lastname, email, userphoto } = useContext(AuthContext);
+  const { username, firstname, lastname, email, userphoto, phonenumber } = useContext(AuthContext);
   const [isMenOpen, setMenOpen] = useState(false);
   const [isWomenOpen, setWomenOpen] = useState(false);
   const [isKidsOpen, setKidsOpen] = useState(false);
@@ -22,7 +22,8 @@ const CustomDrawerContent = (props) => {
             :
           <Image source={require('../../assets/images/No_Image.jpg')} style={{ height: 80, width: 80, borderRadius: 40, margin: 20 }} />}
           <Text style={[globalStyles.defaultText, { fontSize: 20, color: '#fff', marginBottom: 10, marginTop: -10 }]}>{firstname ? firstname : 'Вам необхідно увійти або зареєструватись'} {lastname ? lastname : null}</Text>
-          <Text style={[globalStyles.defaultText, { fontSize: 16, color: '#fff' }]}>Login: { username ? username: 'None' }</Text>
+          <Text style={[globalStyles.defaultText, { fontSize: 16, color: '#fff' }]}>Login: {username ? username : 'None'}</Text>
+          <Text style={[globalStyles.defaultText, { fontSize: 16, color: '#fff' }]}>Phone: { phonenumber ? phonenumber: 'None' }</Text>
           <Text style={[globalStyles.defaultText, { fontSize: 16, color: '#fff' }]}>Email: { email ? email : 'None'}</Text>
         </Pressable>
       </ImageBackground>
@@ -125,7 +126,7 @@ const CustomDrawerContent = (props) => {
       />
       <DrawerItem
         label={()=><Text style={[globalStyles.boldText, styles.label]}>&#8226;  Знайти магазин</Text>}
-        onPress={() => props.navigation.navigate('Error')}
+        onPress={() => props.navigation.navigate('StoreLocator')}
       />
     </DrawerContentScrollView>
   );

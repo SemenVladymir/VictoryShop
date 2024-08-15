@@ -99,6 +99,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  //Метод сохранения изображения в локальной директории
   const saveImageToLocalDirectory = async (uri) => {
     try {
       const fileName = 'Profilephoto.png'; // Название файла, под которым он будет сохранен
@@ -122,9 +123,41 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  
+  //Метод получения изображения из локальной директории
+  const getImageFromLocalDirectory = async () => {
+    try {
+      const fileName = 'Profilephoto.png'; // Название файла, которое нужно получить
+      const directory = FileSystem.documentDirectory + 'assets/images/';
+      const filePath = directory + fileName;
+      setUserPhoto(filePath);
+      return filePath;
+      // Проверьте, существует ли файл
+      const fileInfo = await FileSystem.getInfoAsync(filePath);
+      if (!fileInfo.exists) {
+        console.log('File does not exist');
+        return null; // Можно вернуть null или другую обработку отсутствия файла
+      }
+  
+      // Считайте файл как base64 строку
+      const imageBase64 = await FileSystem.readAsStringAsync(filePath, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+  
+      console.log('Image retrieved from local directory');
+      return 'data:image/png;base64,' + imageBase64; // Верните изображение в формате base64
+    } catch (error) {
+      console.error('Error retrieving image:', error);
+      return null; // Возвращайте null или другую обработку ошибок
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{hasToken, saveImageToLocalDirectory, username, userToken, refreshToken,
-      firstname, lastname, phonenumber, birthdate, userphoto, email, userEntered,
+    <AuthContext.Provider value={{
+      hasToken, saveImageToLocalDirectory, getImageFromLocalDirectory,
+      username, userToken, refreshToken, firstname, lastname, phonenumber,
+      birthdate, userphoto, email, userEntered, setUserEntered, setFirstName,
+      setLastName, setPhoneNumber, setEmail,
     }}>
       {children}
     </AuthContext.Provider>

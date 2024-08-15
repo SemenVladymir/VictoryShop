@@ -1,10 +1,11 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useCallback } from 'react';
 import { View, Text, Image, Pressable, TextInput, StyleSheet, ScrollView, SafeAreaView, Alert } from 'react-native';
-import globalStyles from '../../screens/Other/styles';
+import globalStyles from '../Other/styles';
 import Header from '../../components/common/header';
 import { useNavigation } from '@react-navigation/native';
 import { OrderContext } from '../../store/OrderContext';
 import { ProductContext } from '../../store/ProductContext';
+import { useFocusEffect } from '@react-navigation/native';
 
 
 // Используем локаль 'uk-UA' для форматирования цифр с разделение на порядки по-украински
@@ -55,29 +56,32 @@ const CartItem = ({ item, onIncrease, onDecrease, onRemove }) => {
 
 
 export default function CartScreen({ navigation }) {
-  const { actualOrders, getActualOrders } = useContext(OrderContext);
+  const { setActualOrders, getActualOrders, changeOrder } = useContext(OrderContext);
   const { products } = useContext(ProductContext);
   const [cart, setCart] = useState([]);
 
-  useEffect(() => {
-    getActualOrders().then(orders => {
-    if (Array.isArray(orders) && orders.length > 0) {
-      // console.table('Count actual orders in cart - ' + orders.length);
-      const tmp = orders.filter(item => item.statusId == 2);
-      if (tmp && products) {
-        const productIds = tmp.map(item => item.productId);
-        const filteredProducts = products.filter(product => productIds.includes(product.id));
-        setCart(filteredProducts);
-        // console.table('filtered products - ', filteredProducts);
-      }
-    } else {
-      setCart(null);
-    }
-  })
-  .catch(error => {
-    console.error('Error loading orders:', error);
-  });
-  }, [actualOrders]);
+  useFocusEffect(
+    useCallback(() => {
+      getActualOrders().then(orders => {
+        if (Array.isArray(orders) && orders.length > 0) {
+          // console.table('Count actual orders in cart - ' + orders.length);
+          const tmp = orders.filter(item => item.statusId == 2);
+          if (tmp && products) {
+            const productIds = tmp.map(item => item.productId);
+            const filteredProducts = products.filter(product => productIds.includes(product.id));
+            setCart(filteredProducts);
+            // console.table('filtered products - ', filteredProducts);
+          }
+        } else {
+          setCart(null);
+        }
+      })
+      .catch(error => {
+        console.error('Error loading orders:', error);
+        navigation.navigate('Error');
+      });
+    }, [])
+  );
 
   // const [cart, setCart] = useState([
   //     {
@@ -162,7 +166,17 @@ export default function CartScreen({ navigation }) {
   };
 
   const removeItem = (id) => {
-    setCart(cart.filter(item => item.id !== id));
+    getActualOrders().then(orders => {
+      setCart(cart.filter(item => item.id !== id));
+      const deleteorder = orders.find(e => e.productId == id);
+      changeOrder(deleteorder, 4, 1);
+      setActualOrders(cart);
+      console.log('Order deleted');
+  })
+  .catch(error => {
+    console.error('Error loading orders:', error);
+    navigation.navigate('Error');
+  });
   };
 
   const applyPromoCode = () => {
@@ -174,15 +188,15 @@ export default function CartScreen({ navigation }) {
     navigation.navigate('Catalog');
   };
 
-  const totalAmount = cart.reduce((total, item) => total + item.price * item.quantity, 0);
-  const totalQuantity = cart.reduce((total, item) => total + item.quantity, 0);
+  const totalAmount = cart ? cart.reduce((total, item) => total + item.price * item.quantity, 0) : 0;
+  const totalQuantity = cart ? cart.reduce((total, item) => total + item.quantity, 0) : 0;
 
 
   return (
       <SafeAreaView style={styles.container}>
       {/* <Header cartCount={totalQuantity}/> */}
       <Header />
-      {cart.length ? <>
+      {cart && cart.length > 0 ? <>
         <View style={styles.title}>
             <Text style={[globalStyles.boldText, styles.titletext]}>Кошик</Text>
         </View>

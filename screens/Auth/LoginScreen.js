@@ -1,14 +1,14 @@
-import React  from 'react';
-import { StyleSheet, Text, TextInput, View, ActivityIndicator, FlatList, Pressable } from 'react-native';
+import React, { useContext, useState }  from 'react';
+import { StyleSheet, Text, TextInput, View, Pressable, Alert } from 'react-native';
 import API from '../../services/api';
-import { useEffect, useState } from 'react';
 import globalStyles from '../Other/styles';
-// import axios from "axios";
 import { useNavigation } from '@react-navigation/native';
 import Header from '../../components/common/header';
+import { AuthContext } from '../../store/AuthContext';
+import { StackActions } from '@react-navigation/native';
 
 export default function Login({ navigation }) {
-
+  const { setUserEntered } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
   const [username, setUserName] = useState('');
   const [password, setPassword] = useState('');
@@ -21,13 +21,20 @@ export default function Login({ navigation }) {
     setLoading(true);
     try {
       console.log(`Username - ${username} and password - ${password}`)
-      await API.login(username, password);
-      //navigation.navigate('Home');
-        console.log("Login OK"); 
-      navigation.navigate('Main');  
+      const response = await API.login(username, password);
+      console.log("Response after login "+response);
+      if (!response)
+        Alert.alert('Ви ввели невірні дані, спробуйте ще раз!')
+      else {
+        console.log("Login OK");
+        setUserEntered(true);
+        navigation.navigate('Main');
+        // navigation.navigate('Main');
+      }
     } catch (err) {
-        console.log(`login error: ${err}`);
-        setError('Login failed');
+      console.log(`login error: ${err}`);
+      setError('Login failed');
+      navigation.navigation('Error');
     }
     finally {
       setLoading(false);
@@ -65,16 +72,7 @@ export default function Login({ navigation }) {
                     <Text style={[globalStyles.defaultText, styles.buttonText]}>Продовжити</Text>
                 </Pressable>
       </View>
-      {/* {loading ? (
-        <ActivityIndicator size="large" color="#0000ff" />
-      ) : (
-        <FlatList
-          data={data}
-          keyExtractor={(item) => item.Id}
-          renderItem={({ item }) => <Text style={[globalStyles.defaultText, styles.link]}>{item.Name}</Text>}
-        />
-      )} */}
-        </View>
+    </View>
     );
 }
 

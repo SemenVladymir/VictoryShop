@@ -1,8 +1,8 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useCallback } from 'react';
 import { StyleSheet, Text, TextInput, View, ScrollView, SafeAreaView, Pressable, Image } from 'react-native';
 import globalStyles from '../Other/styles';
 import Header from '../../components/common/header';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
 import { OrderContext } from '../../store/OrderContext';
 import { AuthContext } from '../../store/AuthContext';
 import { useRoute } from '@react-navigation/native';
@@ -11,8 +11,8 @@ import { useRoute } from '@react-navigation/native';
 const formatNumber = (number) => { return number.toLocaleString('uk-UA'); };
 
 export default function OrderScreen({ navigation}) {
-  const { actualOrders, getActualOrders } = useContext(OrderContext);
-  const { username, firstname, lastname, phonenumber, birthdate, userphoto, email, refreshedToken } = useContext(AuthContext);
+  const { setActualOrders, getActualOrders, changeOrder, createDelivery, createPayment } = useContext(OrderContext);
+  const { firstname, lastname, phonenumber, email  } = useContext(AuthContext);
   // const navigation = useNavigation();
   const route = useRoute();
   const [firstName, setFirstName] = useState('');
@@ -115,10 +115,51 @@ export default function OrderScreen({ navigation}) {
   
   
   // const totalAmount = orderProducts.reduce((total, item) => total + item.price * item.quantity, 0);
-  const totalAmount = orderProducts.reduce((total, product) => {return total + product.price * product.quantity;}, 0);
+ 
+ 
+  const totalAmount = () => {
+    if (orderProducts) 
+      return orderProducts.reduce((total, product) => { return total + product.price * product.quantity; }, 0);
+    return 0;
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      if (orderProducts)
+        setCheckOrder(false);
+    }, [])
+  );
+
 
   const handleCheckOrder = () => {
-    setCheckOrder(true);
+    getActualOrders().then(orders => {
+      console.log('All actual Orders from orderscreen ' + orders);
+      if (orders) {
+        for (const item of orderProducts) {
+          // console.log('Product from order screen ' + item);
+          var order = orders.find(e => e.productId == item.id);
+          // console.log('Order for change - ' + order);
+          changeOrder(order, 3, 1);
+          createDelivery(order.id, 2, `${country}, ${address}, ${postalCode}`, organization);
+          createPayment(order.id, item.price, 2, item.quantity);
+        }
+        setCheckOrder(true);
+        getActualOrders().then(orders => {
+          if (orders)
+            setActualOrders(orders);
+          else
+            setActualOrders(null);
+        })
+        .catch(error => {
+          console.error('Error loading orders:', error);
+          navigation.navigate('Error');
+        });
+      }
+    })
+    .catch(error => {
+      console.error('Error loading orders:', error);
+      navigation.navigate('Error');
+    });
   }; 
 
   const RenderItem = ({ item }) => (
@@ -152,24 +193,27 @@ export default function OrderScreen({ navigation}) {
     <ScrollView style={styles.scrollcontainer}>
 
       <Text style={[globalStyles.boldText, styles.label]}>Ваші данні</Text>
-      <TextInput style={[globalStyles.defaultText, styles.input]} placeholder="Ім'я" value={firstName} onChangeText={setFirstName} />
-      <TextInput style={[globalStyles.defaultText, styles.input]} placeholder="Прізвище" value={lastName} onChangeText={setLastName} />
-      <TextInput style={[globalStyles.defaultText, styles.input]} placeholder="E-mail" value={useremail} onChangeText={setEmail} />
-      <TextInput style={[globalStyles.defaultText, styles.input]} placeholder="Номер телефону" value={phone} onChangeText={setPhone} keyboardType="phone-pad" />
-
-      <Text style={[globalStyles.boldText, styles.label]}>Обрані товари</Text>
+          {firstname ? <TextInput style={[globalStyles.defaultText, styles.input]} placeholder="Ім'я" value={firstname} onChangeText={setFirstName} /> :
+            <TextInput style={[globalStyles.defaultText, styles.input]} placeholder="Ім'я" value={firstName} onChangeText={setFirstName} />}
+          {lastname ? <TextInput style={[globalStyles.defaultText, styles.input]} placeholder="Прізвище" value={lastname} onChangeText={setLastName} /> :
+            <TextInput style={[globalStyles.defaultText, styles.input]} placeholder="Прізвище" value={lastName} onChangeText={setLastName} />}
+          {email ? <TextInput style={[globalStyles.defaultText, styles.input]} placeholder="E-mail" value={email} onChangeText={setEmail} /> :
+            <TextInput style={[globalStyles.defaultText, styles.input]} placeholder="E-mail" value={useremail} onChangeText={setEmail} />}
+          {phonenumber ? <TextInput style={[globalStyles.defaultText, styles.input]} placeholder="Номер телефону" value={phonenumber} onChangeText={setPhone} keyboardType="phone-pad" /> :
+            <TextInput style={[globalStyles.defaultText, styles.input]} placeholder="Номер телефону" value={phone} onChangeText={setPhone} keyboardType="phone-pad" />}
       
-        <View style={styles.listcontainer}>
-        {orderProducts.map(item => (
-            <RenderItem
-              key={item.id}
-              item={item}
-            />))}
-        </View>
+          <Text style={[globalStyles.boldText, styles.label]}>Обрані товари</Text>
+          <View style={styles.listcontainer}>
+          {orderProducts.map(item => (
+              <RenderItem
+                key={item.id}
+                item={item}
+              />))}
+          </View>
 
-        <Text style={[globalStyles.boldText, styles.label, {fontSize: 20, marginTop: -10}]}>Вартість: {formatNumber(totalAmount)} грн.</Text>
+          <Text style={[globalStyles.boldText, styles.label, {fontSize: 20, marginTop: -10}]}>Вартість: {formatNumber(totalAmount())} грн.</Text>
 
-      <Text style={[globalStyles.boldText, styles.label]}>Варіанти доставки</Text>
+          <Text style={[globalStyles.boldText, styles.label]}>Варіанти доставки</Text>
         
         <View style={styles.checkboxContainer}>
           <View style={styles.leftStyle}>

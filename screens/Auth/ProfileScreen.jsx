@@ -4,26 +4,40 @@ import { Icon } from 'react-native-elements';
 import globalStyles from '../Other/styles';
 import Header from '../../components/common/header';
 import * as ImagePicker from 'expo-image-picker';
-import * as FileSystem from 'expo-file-system';
+import API from '../../services/api';
 import { Camera } from 'expo-camera';
 import { AuthContext } from '../../store/AuthContext';
 
 const Profile = ({ navigation }) => {
-  const { username, firstname, lastname, phonenumber, birthdate, userphoto, email, saveImageToLocalDirectory } = useContext(AuthContext);
-  const [imageUri, setImageUri] = useState(require('../../assets/images/No_Image.jpg'));
-  const [savedImageUri, setSavedImageUri] = useState(null);
+  const { firstname, lastname, phonenumber, email, setUserEntered,
+          getImageFromLocalDirectory, saveImageToLocalDirectory, setFirstName,
+          setLastName, setPhoneNumber, setEmail, } = useContext(AuthContext);
+  const [imageUri, setImageUri] = useState(null);
+  const [firstName, setFirstName_] = useState(firstname);
+  const [lastName, setLastName_] = useState(lastname);
+  const [phone, setPhone] = useState(phonenumber);
+  const [Email, setEmail_] = useState(email);
   const [error, setError] = useState('');
 
   const [hasCameraPermission, setHasCameraPermission] = useState(null);
   const [camera, setCamera] = useState(null);
 
-  // useEffect(() => {
-  //   if (userphoto) {
-  //     setImageUri(userphoto);
-  //   }
-  //   else
-  //     setImageUri(null);
-  // }, [userphoto]);
+  useEffect(() => {
+    if (setUserEntered) {
+      getImageFromLocalDirectory().then(respons => {
+        setImageUri(respons);
+        // setFirstName_(firstname);
+        // setLastName_(lastname);
+        // setPhone(phonenumber);
+        // setEmail_(email);
+      }).catch(error => {
+        console.error('Error loading orders:', error);
+        navigation.navigate('Error');
+      });
+    }
+    else
+      setImageUri(null);
+  }, []);
 
   //Получение разрешения для выбора изображения для профиля
   const showImagePickerOptions = () => {
@@ -93,6 +107,22 @@ const Profile = ({ navigation }) => {
     }
   };
 
+  const handleSaveProfile = async () => {
+    try {
+      console.log('firstName - ' + firstName);
+      await API.updateprofile('', '', Email, 'User', new Date(), firstName, lastName, phone);
+      setFirstName(firstName);
+      setLastName(lastName);
+      setPhoneNumber(phone);
+      setEmail(Email);
+      console.log('Start saving image');
+      await API.uploadImage(imageUri);
+    }
+    catch (error) {
+      console.log('Error while profile save '+error);
+    }
+  };
+
 
   return (
     <View style={styles.container}>
@@ -100,32 +130,53 @@ const Profile = ({ navigation }) => {
       <ScrollView style={styles.container}>
       <View style={styles.profileContainer}>
         <Pressable onPress={showImagePickerOptions}>
-            {/* {imageUri ? <Image source={{ uri: imageUri }} style={styles.profileImage} />
+            {imageUri ? <Image source={{ uri: imageUri }} style={styles.profileImage} />
               :
-            <Image source={require('../../assets/images/No_Image.jpg')} style={styles.profileImage} />} */}
+            <Image source={require('../../assets/images/No_Image.jpg')} style={styles.profileImage} />}
           <Text style={[globalStyles.defaultText, styles.changePhotoText]}>Змінити фото</Text>
         </Pressable>
 
         <View style={styles.inputContainer}>
             <Text style={[globalStyles.boldText, styles.text]}>Ім'я</Text>
-            {firstname ? <TextInput style={[globalStyles.defaultText, styles.input, styles.borders]} value={ firstname } />
+            {firstname ? <TextInput style={[globalStyles.defaultText, styles.input, styles.borders]}
+              placeholder={firstName}
+              value={firstName}
+              onChangeText={setFirstName_}
+            />
               :
-              <TextInput style={[globalStyles.defaultText, styles.input, styles.borders]} placeholder="Ім'я*" />}
+              <TextInput style={[globalStyles.defaultText, styles.input, styles.borders]}
+                placeholder="Ім'я*"
+                onChangeText={setFirstName_}
+              />}
         </View>
 
         <View style={styles.inputContainer}>
             <Text style={[globalStyles.boldText, styles.text]}>Прізвище</Text>
-            {lastname ? <TextInput style={[globalStyles.defaultText, styles.input, styles.borders]} value={ lastname } />
+            {lastname ? <TextInput style={[globalStyles.defaultText, styles.input, styles.borders]}
+              placeholder={lastName}
+              value={lastName}
+              onChangeText={setLastName_}
+            />
               :
-              <TextInput style={[globalStyles.defaultText, styles.input, styles.borders]} placeholder="Прізвище" />}
+              <TextInput style={[globalStyles.defaultText, styles.input, styles.borders]}
+                placeholder="Прізвище"
+                onChangeText={setLastName_}
+              />}
         </View>
 
         <View style={styles.inputContainer}>
             <Text style={[globalStyles.boldText, styles.text]}>Номер телефону</Text>
             <View style={[styles.inputWithIcon, styles.borders]}>
-              {phonenumber ? <TextInput style={[globalStyles.defaultText, styles.input]} value={phonenumber} />
+              {phonenumber ? <TextInput style={[globalStyles.defaultText, styles.input]}
+                value={phone}
+                placeholder={phone}
+                onChangeText={setPhone}
+              />
                 :
-                <TextInput style={[globalStyles.defaultText, styles.input]} placeholder="+380" />}
+                <TextInput style={[globalStyles.defaultText, styles.input]}
+                  placeholder="+380"
+                  onChangeText={setPhone}
+                />}
             <Icon name="edit" size={20} color="#000" backgroundColor='#F5F5F5'/>
           </View>
         </View>
@@ -133,13 +184,20 @@ const Profile = ({ navigation }) => {
         <View style={styles.inputContainer}>
             <Text style={[globalStyles.boldText, styles.text]}>Ел. пошта</Text>
             <View style={[styles.inputWithIcon, styles.borders]}>
-              {email ? <TextInput style={[globalStyles.defaultText, styles.input]} value={email} />
+              {email ? <TextInput style={[globalStyles.defaultText, styles.input]}
+                value={Email}
+                placeholder={Email}
+                onChangeText={setEmail_}
+              />
                 :
-                <TextInput style={[globalStyles.defaultText, styles.input]} placeholder="--------" />}
+                <TextInput style={[globalStyles.defaultText, styles.input]}
+                  placeholder="--------"
+                  onChangeText={setEmail_}
+                />}
             <Icon name="edit" size={20} color="#000" backgroundColor='#F5F5F5'/>
           </View>
         </View>
-        <Pressable style={styles.button} onPress={() => navigation.navigate('Home')}>
+        <Pressable style={styles.button} onPress={() => handleSaveProfile()}>
           <Text style={[globalStyles.defaultText, styles.buttonText]}>Зберегти</Text>
         </Pressable>
       </View>
@@ -161,7 +219,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    resizeMode: 'contain',
+    resizeMode: 'cover',
   },
   changePhotoText: {
     color: '#000',

@@ -124,7 +124,13 @@ const ProductItem = ({ route }) => {
       setCatalog(products);
   }, [searchproducts, filter]);
 
-
+  const ProductItem = React.memo(({ item }) => {
+    return (
+      <View style={styles.container}>
+        <Product item={ item }/>
+      </View>
+    );
+  });
     
   return (
     <SafeAreaView style={styles.container}>
@@ -137,7 +143,7 @@ const ProductItem = ({ route }) => {
       </View>
           <FlatList
             data={catalog}
-            renderItem={({ item }) => <Product item={item} />}
+            renderItem={({ item }) => <ProductItem item={item} />}
             keyExtractor={item => item.id.toString()}
             numColumns={2}
             contentContainerStyle={styles.list}
