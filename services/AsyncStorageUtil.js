@@ -30,6 +30,16 @@ export const getData = async (key) => {
   }
 };
 
+export const getDataString = async (key) => {
+  try {
+    const data = await AsyncStorage.getItem(key);
+    return data != null ? JSON.parse(data) : null;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+};
+
 // Добавление нового data в массив
 export const addNewData = async (key, newData) => {
   try {
@@ -54,3 +64,11 @@ export const removeDataItemById = async (key, dataItemId) => {
   }
 };
 
+//Очистка данных из AsyncStorage
+export const clearData = async (key) => {
+  try {
+    const data = await AsyncStorage.removeItem(key);
+  } catch (e) {
+    console.error(e);
+  }
+};

@@ -1,5 +1,5 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system';
+import { saveData, clearData, getDataString } from './AsyncStorageUtil';
 
 class API {
   constructor() {
@@ -9,20 +9,14 @@ class API {
     API.instance = this;
 
     // this.baseUrl = 'https://localhost:7000/api';
-    this.baseUrl = 'http://192.168.0.110:5000/api'
+    this.baseUrl = 'http://192.168.0.110:5156/api'
     this.headers = {
       'Content-Type': 'application/json',
       'charset': 'utf-8',
       'X-Content-Type-Options': 'no-sniff',
     };
-    // this.navigation = navigation;
     return this;
   }
-
-  // gotoLogin = () => {
-  //   const navigation = useNavigation();
-
-  // };
 
   addDays = (days) => {
     return (Date.now() + days*24*3600*1000);
@@ -30,23 +24,23 @@ class API {
 
   async setTokens(token, refreshToken) {
     this.headers['Authorization'] = `Bearer ${token}`;
-    await AsyncStorage.setItem('token', token);
-    await AsyncStorage.setItem('refreshToken', refreshToken);
-    await AsyncStorage.setItem('RefreshTokenEndDate', JSON.stringify(new Date(this.addDays(7)).getTime()));
+    await saveData('Token', token);
+    await saveData('RefreshToken', refreshToken);
+    await saveData('RefreshTokenEndDate', JSON.stringify(new Date(this.addDays(7)).getTime()));
   }
 
   async loadTokens() {
-    const token = await AsyncStorage.getItem('token');
-    const refreshToken = await AsyncStorage.getItem('refreshToken');
+    const token = await getDataString('Token');
+    // console.log('Token fron AsyncStorage (loadTokens API line 40) - ' + token);
+    const refreshToken = await getDataString('RefreshToken');
     if (token) {
       this.headers['Authorization'] = `Bearer ${token}`;
     }
-    // await this.refreshToken();
   }
 
   async refreshToken() {
-    const token = await AsyncStorage.getItem('token');
-    const refreshToken = await AsyncStorage.getItem('refreshToken');
+    const token = await getDataString('Token');
+    const refreshToken = await getDataString('RefreshToken');
     this.headers['Authorization'] = `Bearer ${token}`;
     try
     {
@@ -57,9 +51,7 @@ class API {
       });
       
       if (!response.ok) {
-        // navigation.navigate('Login');
         throw new Error('Failed to refresh token');
-
       }
 
       const data = await response.json();
@@ -151,8 +143,8 @@ class API {
       }
       
       const data = await response.json();
-      console.log('Token after Login - '+data.token);
-      console.log('RefreshToken after Login - '+data.refreshToken);
+      // console.log('Token after Login - '+data.token);
+      // console.log('RefreshToken after Login - '+data.refreshToken);
       await this.setTokens(data.token, data.refreshToken);
       return response;
     }
@@ -163,7 +155,6 @@ class API {
   }
 
   async updateprofile(Username, Password, Email, Role = 'User', BirthDate, FirstName, LastName, PhoneNumber) {
-    console.log(FirstName);
     const response = await fetch(`${this.baseUrl}/Auth/UpdateProfile`, {
       method: 'POST',
       headers: this.headers,
@@ -176,15 +167,14 @@ class API {
   }
 
   async logout() {
-    await AsyncStorage.removeItem('token');
-    await AsyncStorage.removeItem('refreshToken');
-    await AsyncStorage.removeItem('RefreshTokenEndDate');
+    await clearData('Token');
+    await clearData('RefreshToken');
+    await clearData('RefreshTokenEndDate');
     this.headers['Authorization'] = null;
   }
 
   async uploadImage(imageUri) {
     if (!imageUri) return;
-  
     // Подготовка данных для отправки
     let localUri = imageUri;
     let filename = localUri.split('/').pop();
@@ -193,11 +183,14 @@ class API {
     let type = match ? `image/${match[1]}` : `image`;
   
     let formData = new FormData();
-    console.log('Image data');
     formData.append('file', { uri: localUri, name: filename, type });
   
     try {
-      const url = `${this.baseUrl}/Auth/UploadProfilePhoto`;
+      let url;
+      if (!await this.downloadImage())
+        url = `${this.baseUrl}/Auth/UploadProfilePhoto`;
+      else
+        url = `${this.baseUrl}/Auth/UpdateProfilePhoto`;
       await this.loadTokens();
       const response = await this.fetchWithAuth(url, {
         method: 'POST',
@@ -211,7 +204,7 @@ class API {
       // Проверка успешности запроса
       if (response.ok) {
         const responseData = await response.json();
-        console.log('Upload successful:', responseData);
+        // console.log('Upload successful:', responseData);
       } else {
         console.error('Upload failed with status:', response.status);
       }
@@ -230,7 +223,8 @@ class API {
       });
 
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        return null;
+        throw new Error('Network response was not ok');  
       } 
 
       const blob = await response.blob();
@@ -255,10 +249,7 @@ class API {
     } catch (error) {
       console.error('Error downloading image:', error);
     }
-};
-
-
-  // Другие методы API (PUT, DELETE и т.д.) по мере необходимости
+  };
 }
 
 const instance = new API();

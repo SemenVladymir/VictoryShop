@@ -76,7 +76,7 @@ return (
           screenOptions={{
             drawerPosition: 'right',
             headerShown: false,
-            drawerStyle: { right: 0, width: 320 },
+            drawerStyle: { right: 0, width: 330 },
             drawerActiveBackgrondColor: '#4748FF',
             gestureEnabled: false,
           }}
@@ -106,15 +106,17 @@ return (
 };
 
 export default function AppNavigator() {
+  const navigationRef = useNavigationContainerRef();
+
   return (
     <AuthProvider>
-        <ProductProvider>
-          <OrderProvider>
-            <FontProvider>
-              <AppContent />
-            </FontProvider>
-          </OrderProvider>
-        </ProductProvider>
+      <ProductProvider>
+        <OrderProvider>
+          <FontProvider>
+            <AppContent />
+          </FontProvider>
+        </OrderProvider>
+      </ProductProvider>
     </AuthProvider>
   );
 }

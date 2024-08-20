@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect, useCallback } from 'react';
 import { View, Text, Image, Pressable, TextInput, StyleSheet, ScrollView, SafeAreaView, Alert } from 'react-native';
 import globalStyles from '../Other/styles';
 import Header from '../../components/common/header';
+import CheckBox from '../../components/common/CustomCheckbox';
 import { useNavigation } from '@react-navigation/native';
 import { OrderContext } from '../../store/OrderContext';
 import { ProductContext } from '../../store/ProductContext';
@@ -18,17 +19,17 @@ const CartItem = ({ item, onIncrease, onDecrease, onRemove }) => {
       <View style={styles.cartItem}>
       <Pressable onPress={() => navigation.navigate('ProductPage', {product: item })}>
         <Image source={{ uri: item.photos[0].url }} style={styles.image} />
-          {item.discount ? <Image source={require('../../assets/images/Discount.png')} style={styles.discountImage}/> : null}
+          {item.discountId > 1 ? <Image source={require('../../assets/images/Discount.png')} style={styles.discountImage}/> : null}
         </Pressable>
       
         <View style={styles.details}>
           <Text style={[globalStyles.boldText, styles.itemName]}>{item.name}</Text>
           <Text style={[globalStyles.defaultText, styles.itemType]}>{item.cathegory}</Text>
-          {!item.discount ?
-            <Text style={[globalStyles.boldText, styles.itemPrice]} >{formatNumber(item.price)} грн.</Text>
-            :
-            <Text style={[globalStyles.boldText, styles.itemPriceDiscount]} >{formatNumber(item.price)} грн.</Text>
-          }
+        {item.discountId > 1 ?
+          <Text style={[globalStyles.boldText, styles.itemPriceDiscount]} >{formatNumber(item.price)} грн.</Text>
+          :
+          <Text style={[globalStyles.boldText, styles.itemPrice]} >{formatNumber(item.price)} грн.</Text>
+        }
         </View>
       
         <View style={styles.quantityContainer}>
@@ -64,14 +65,15 @@ export default function CartScreen({ navigation }) {
     useCallback(() => {
       getActualOrders().then(orders => {
         if (Array.isArray(orders) && orders.length > 0) {
-          // console.table('Count actual orders in cart - ' + orders.length);
-          const tmp = orders.filter(item => item.statusId == 2);
-          if (tmp && products) {
-            const productIds = tmp.map(item => item.productId);
-            const filteredProducts = products.filter(product => productIds.includes(product.id));
+          // console.log('Count actual orders in cart - ' + orders.length);
+          // const tmp = orders.filter(item => item.statusId == 2);
+          // if (tmp && products) {
+            const productIds = orders.map(item => item.productId);
+          const filteredProducts = products.filter(product => productIds.includes(product.id));
+          console.log('Count actual products in cart - ' + filteredProducts.length);
             setCart(filteredProducts);
             // console.table('filtered products - ', filteredProducts);
-          }
+          // }
         } else {
           setCart(null);
         }
@@ -184,7 +186,6 @@ export default function CartScreen({ navigation }) {
   };
 
   const handleCatalog = () => {
-    // Implement the navigation to home screen here
     navigation.navigate('Catalog');
   };
 
@@ -221,9 +222,10 @@ export default function CartScreen({ navigation }) {
 
           <View style={styles.promoContainer}>
             <View style={styles.checkboxContainer}>
-              <Pressable onPress={() => sethasPromocode(!hasPromocode)} style={[styles.checkboxBase, hasPromocode && styles.checkboxChecked]}>
-                {hasPromocode && <View style={styles.checkboxIcon} />}
-              </Pressable>
+            <CheckBox
+              value={hasPromocode}
+              onValueChange={() => sethasPromocode(!hasPromocode)}
+            />
               <Text style={[globalStyles.defaultText, styles.promotext]} >У вас є промокод?</Text>
             </View>
             {hasPromocode ?
@@ -324,6 +326,7 @@ const styles = StyleSheet.create({
   itemPrice: {
     fontSize: 14,
     marginBottom: 2,
+    color: '#000',
   },
   itemPriceDiscount: {
     fontSize: 14,

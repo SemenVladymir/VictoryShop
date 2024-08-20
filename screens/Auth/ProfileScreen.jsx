@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useCallback } from 'react';
 import { ScrollView, View, Text, Image, StyleSheet, TextInput, Platform, Alert, Pressable } from 'react-native';
 import { Icon } from 'react-native-elements';
 import globalStyles from '../Other/styles';
@@ -7,37 +7,43 @@ import * as ImagePicker from 'expo-image-picker';
 import API from '../../services/api';
 import { Camera } from 'expo-camera';
 import { AuthContext } from '../../store/AuthContext';
+import { getData, saveData } from '../../services/AsyncStorageUtil';
+import { useFocusEffect } from '@react-navigation/native';
 
 const Profile = ({ navigation }) => {
-  const { firstname, lastname, phonenumber, email, setUserEntered,
-          getImageFromLocalDirectory, saveImageToLocalDirectory, setFirstName,
-          setLastName, setPhoneNumber, setEmail, } = useContext(AuthContext);
-  const [imageUri, setImageUri] = useState(null);
+  const { firstname, lastname, phonenumber, email, userEntered, setFirstName,
+          setLastName, setPhoneNumber, setEmail, setUserPhoto } = useContext(AuthContext);
+  const [imageUri, setImageUri] = useState('');
   const [firstName, setFirstName_] = useState(firstname);
   const [lastName, setLastName_] = useState(lastname);
   const [phone, setPhone] = useState(phonenumber);
   const [Email, setEmail_] = useState(email);
-  const [error, setError] = useState('');
+
 
   const [hasCameraPermission, setHasCameraPermission] = useState(null);
-  const [camera, setCamera] = useState(null);
 
-  useEffect(() => {
-    if (setUserEntered) {
-      getImageFromLocalDirectory().then(respons => {
-        setImageUri(respons);
-        // setFirstName_(firstname);
-        // setLastName_(lastname);
-        // setPhone(phonenumber);
-        // setEmail_(email);
-      }).catch(error => {
-        console.error('Error loading orders:', error);
-        navigation.navigate('Error');
-      });
-    }
-    else
-      setImageUri(null);
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      if (userEntered) {
+        setFirstName(firstName);
+        setLastName(lastName);
+        setPhoneNumber(phone);
+        setEmail(Email);
+        getData('ProfilePhoto').then(photo => {
+          if (photo)
+            setImageUri(photo);
+          else
+            setImageUri(null);
+        }).catch(error => {
+          console.error('Error loading orders:', error);
+          navigation.navigate('Error');
+        });
+      } else {
+        setImageUri(null);
+        navigation.navigate('Enter');
+      }
+    }, [userEntered])
+  );
 
   //Получение разрешения для выбора изображения для профиля
   const showImagePickerOptions = () => {
@@ -77,9 +83,8 @@ const Profile = ({ navigation }) => {
     });
 
     if (!result.canceled) {
-      console.log(result.assets[0].uri);
+      // console.log('Image from line 80 ProfileScreen - '+result.assets[0].uri);
       setImageUri(result.assets[0].uri);
-      saveImageToLocalDirectory(result.assets[0].uri);
       // setImageUri(result.uri);
       // saveImageToLocalDirectory(result.uri);
       // console.log(imageUri);
@@ -102,21 +107,22 @@ const Profile = ({ navigation }) => {
 
     if (!result.canceled) {
       setImageUri(result.assets[0].uri);
-      console.log(imageUri);
-      saveImageToLocalDirectory(result.assets[0].uri);
+      // console.log(imageUri);
+      // saveImageToLocalDirectory(result.assets[0].uri);
     }
   };
 
   const handleSaveProfile = async () => {
     try {
-      console.log('firstName - ' + firstName);
+      // console.log('firstName - ' + firstName);
       await API.updateprofile('', '', Email, 'User', new Date(), firstName, lastName, phone);
       setFirstName(firstName);
       setLastName(lastName);
       setPhoneNumber(phone);
       setEmail(Email);
-      console.log('Start saving image');
       await API.uploadImage(imageUri);
+      await saveData('ProfilePhoto', imageUri);
+      setUserPhoto(imageUri);
     }
     catch (error) {
       console.log('Error while profile save '+error);
@@ -233,9 +239,7 @@ const styles = StyleSheet.create({
   input: {
     padding: 5,
     marginTop: 5,
-    //fontFamily: 'Jura',
     fontSize: 16,
-    // fontWeight: '700',
     height: 50,
     backgroundColor: '#F5F5F5',
   },
@@ -255,7 +259,6 @@ const styles = StyleSheet.create({
   button: {
     marginTop: 30,
     backgroundColor: '#4748FF',
-    // alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 20,
     paddingVertical: 10,
@@ -274,9 +277,7 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 16,
   },
-  label: {
-
-  },
+  label: {},
 });
 
 export default Profile;

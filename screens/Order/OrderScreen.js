@@ -2,6 +2,7 @@ import React, { useState, useContext, useCallback } from 'react';
 import { StyleSheet, Text, TextInput, View, ScrollView, SafeAreaView, Pressable, Image } from 'react-native';
 import globalStyles from '../Other/styles';
 import Header from '../../components/common/header';
+import Checkbox from '../../components/common/CustomCheckbox';
 import { useFocusEffect } from '@react-navigation/native';
 import { OrderContext } from '../../store/OrderContext';
 import { AuthContext } from '../../store/AuthContext';
@@ -162,25 +163,27 @@ export default function OrderScreen({ navigation}) {
     });
   }; 
 
-  const RenderItem = ({ item }) => (
-    <Pressable style={styles.item} onPress={() => navigation.navigate('ProductPage', {product: item})}>
+  const RenderItem = ({ item }) => {
+    return (
+      <Pressable style={styles.item} onPress={() => navigation.navigate('ProductPage', { product: item })}>
 
-      <View style={styles.imagebox}>
-        <Image source={{ uri: item.photos[0].url }} style={styles.image} />
-        {item.discount ? <Image source={require('../../assets/images/Discount.png')} style={styles.discountImage}/> : null}
-      </View>
+        <View style={styles.imagebox}>
+          <Image source={{ uri: item.photos[0].url }} style={styles.image} />
+          {item.discountId > 1 ? <Image source={require('../../assets/images/Discount.png')} style={styles.discountImage} /> : null}
+        </View>
 
-      <View style={styles.info}>
-        <Text style={[globalStyles.boldText, styles.name]}>{item.name}</Text>
-        <Text style={[globalStyles.defaultText, styles.cathegory]}>{item.cathegory}</Text>
-        {!item.discount ?
-          <Text style={[globalStyles.boldText, styles.price]} >{item.price} грн.</Text>
-          :
-          <Text style={[globalStyles.boldText, styles.priceDiscount]} >{item.price} грн.</Text>
-        }
-      </View>
-    </Pressable>
-  );
+        <View style={styles.info}>
+          <Text style={[globalStyles.boldText, styles.name]}>{item.name}</Text>
+          <Text style={[globalStyles.defaultText, styles.cathegory]}>{item.cathegory}</Text>
+          {item.discountId > 1 ?
+            <Text style={[globalStyles.boldText, styles.priceDiscount]} >{formatNumber(item.price)} грн.</Text>
+            :
+            <Text style={[globalStyles.boldText, styles.price]} >{formatNumber(item.price)} грн.</Text>
+          }
+        </View>
+      </Pressable>
+    )
+  };
 
 
   return (
@@ -211,25 +214,21 @@ export default function OrderScreen({ navigation}) {
               />))}
           </View>
 
-          <Text style={[globalStyles.boldText, styles.label, {fontSize: 20, marginTop: -10}]}>Вартість: {formatNumber(totalAmount())} грн.</Text>
+          <Text style={[globalStyles.boldText, styles.label, {fontSize: 20, marginTop: -10}]}>Вартість товарів: {formatNumber(totalAmount())} грн.</Text>
 
           <Text style={[globalStyles.boldText, styles.label]}>Варіанти доставки</Text>
         
         <View style={styles.checkboxContainer}>
-          <View style={styles.leftStyle}>
-            <Pressable onPress={() => setDeliveryHome(!deliveryHome)} style={[styles.checkboxBase, deliveryHome && styles.checkboxChecked]}>
-              {deliveryHome && <View style={styles.checkboxIcon} />}
-            </Pressable>
+            <View style={styles.leftStyle}>
+              <Checkbox value={deliveryHome} onValueChange={() => setDeliveryHome(!deliveryHome)}/>
             <Text style={[globalStyles.defaultText, styles.checkboxLabel]}>Доставка на дім</Text>
           </View>
           <Image source={require('../../assets/images/homeIcon.png')} style={styles.iconImage} />
         </View>
         
         <View style={styles.checkboxContainer}>
-          <View style={styles.leftStyle}>
-            <Pressable onPress={() => setDeliveryHome(!deliveryHome)} style={[styles.checkboxBase, !deliveryHome && styles.checkboxChecked]}>
-              {!deliveryHome && <View style={styles.checkboxIcon} />}
-            </Pressable>
+            <View style={styles.leftStyle}>
+            <Checkbox value={!deliveryHome} onValueChange={() => setDeliveryHome(!deliveryHome)}/>
               <Text style={[globalStyles.defaultText, styles.checkboxLabel]}>Доставка у відділення</Text>
           </View>
           <Image source={require('../../assets/images/postIcon.png')} style={styles.iconImage} />
@@ -237,17 +236,13 @@ export default function OrderScreen({ navigation}) {
         
         {!deliveryHome ? <>
           <View style={styles.checkboxContainerWithoutBorder}>
-        <Pressable onPress={() => setPostDelivery(!postDelivery)} style={[styles.checkboxBase, postDelivery && styles.checkboxChecked]}>
-          {postDelivery && <View style={styles.checkboxIcon} />}
-        </Pressable>
+            <Checkbox value={postDelivery} onValueChange={() => setPostDelivery(!postDelivery)}/>
             <Image source={require('../../assets/images/logo_novayaposhta.png')} style={styles.logoImage} />
             <Text style={[globalStyles.defaultText, styles.checkboxLabel]}>Нова пошта</Text>
           </View>
 
-          <View style={styles.checkboxContainerWithoutBorder}>
-            <Pressable onPress={() => setPostDelivery(!postDelivery)} style={[styles.checkboxBase, !postDelivery && styles.checkboxChecked]}>
-              {!postDelivery && <View style={styles.checkboxIcon} />}
-            </Pressable>
+            <View style={styles.checkboxContainerWithoutBorder}>
+            <Checkbox value={!postDelivery} onValueChange={() => setPostDelivery(!postDelivery)}/>
             <Image source={require('../../assets/images/logo_ukrposhta.png')} style={styles.logoImage} />
             <Text style={[globalStyles.defaultText, styles.checkboxLabel]}>Укрпошта</Text>
           </View>
@@ -270,10 +265,8 @@ export default function OrderScreen({ navigation}) {
         
         </>}
           
-      <View style={styles.checkboxContainerWithoutBorder}>
-      <Pressable onPress={() => setPaymentOnDelivery(!paymentOnDelivery)} style={[styles.checkboxBase, paymentOnDelivery && styles.checkboxChecked]}>
-        {paymentOnDelivery && <View style={styles.checkboxIcon} />}
-        </Pressable>
+          <View style={styles.checkboxContainerWithoutBorder}>
+          <Checkbox value={paymentOnDelivery} onValueChange={() => setPaymentOnDelivery(!paymentOnDelivery)}/>
         <Text style={[globalStyles.defaultText, styles.checkboxLabel]}>Оплата при отриманні</Text>
       </View>
 
@@ -283,20 +276,14 @@ export default function OrderScreen({ navigation}) {
         <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'center' }}>
             
           <View style={[styles.checkboxCardContainer]}>
-            <View style={{width: 20}}></View>
-            <Pressable onPress={() => setVisa(!visa)} style={[styles.checkboxBase, visa && styles.checkboxChecked]}>
-              {visa && <View style={styles.checkboxIcon} />}
-            </Pressable>
+            <View style={{ width: 20 }}></View>
+              <Checkbox value={visa} onValueChange={() => setVisa(!visa)}/>
             <Image source={require('../../assets/images/visaLogo.png')} style={styles.cardlogoImage1} />
-            {/* <Text style={[globalStyles.defaultText, styles.checkboxLabel]}>Visa</Text> */}
           </View>
             <View style={{width: 40}}></View>
-          <View style={[styles.checkboxCardContainer]}>
-            <Pressable onPress={() => setVisa(!visa)} style={[styles.checkboxBase, !visa && styles.checkboxChecked]}>
-              {!visa && <View style={styles.checkboxIcon} />}
-            </Pressable>
+              <View style={[styles.checkboxCardContainer]}>
+              <Checkbox value={!visa} onValueChange={() => setVisa(!visa)}/>
             <Image source={require('../../assets/images/mastercardLogo.png')} style={styles.cardlogoImage2} />
-            {/* <Text style={[globalStyles.defaultText, styles.checkboxLabel]}>MasterCard</Text> */}
           </View>
             
       </View>

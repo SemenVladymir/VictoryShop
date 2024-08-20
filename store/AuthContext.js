@@ -1,9 +1,7 @@
 import React, { createContext, useState, useEffect } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import API from '../services/api';
 import { User } from '../components/User/UserClass'
-import { saveData, getData } from '../services/AsyncStorageUtil';
-import { useNavigation } from '@react-navigation/native';
+import { saveData, getData, getDataString } from '../services/AsyncStorageUtil';
 import * as FileSystem from 'expo-file-system';
 
 
@@ -22,56 +20,44 @@ export const AuthProvider = ({ children }) => {
   const [phonenumber, setPhoneNumber] = useState('');
   const [birthdate, setBirthDate] = useState('');
   const [email, setEmail] = useState('');
-  const [userphoto, setUserPhoto] = useState('');
+  const [userphoto, setUserPhoto] = useState(null);
 
   useEffect(() => {
-    const loadToken = async () => {
-      const date = await AsyncStorage.getItem('RefreshTokenEndDate');
-      if (parseInt(date, 10) < Date.now())
-      {
-        const token = await AsyncStorage.getItem('token');
-        const refreshtoken = await AsyncStorage.getItem('refreshToken');
-          try
-          {
-            if (token) {
-              await API.refreshToken();
-              setHasToken(true);
-              console.log('Token refreshed');
-            }
-            else {
-              console.log('You need registration!');
-            }
-          }
-          catch (err) {
-              console.log(err);
-        }
-        setUserToken(token);
-        setRefreshToken(refreshtoken);
-      }
-      else {
-        // await API.refreshToken();
-        console.log('Time is not exit!');
-        
-      }
-      enterUser();
-      setHasToken(true);
-    };
     loadToken();
   }, []);
 
-  const saveToken = async (token, refresToken) => {
-      await AsyncStorage.setItem('token', token);
-      await AsyncStorage.setItem('refreshToken', refresToken);
-      setUserToken(token);
-      setRefreshToken(refresToken);
+  const loadToken = async () => {
+    const date = await getDataString('RefreshTokenEndDate');
+    if (parseInt(date, 10) < Date.now())
+    {
+      try
+      {
+        const token = await getDataString('Token');
+        console.log('Token from AsyncStorage line 35 AuthContext - ' + token);
+        const Refreshtoken = await getDataString('RefreshToken');
+        console.log('Refreshtoken from AsyncStorage line 37 AuthContext - ' + Refreshtoken);
+        setUserToken(token);
+        setRefreshToken(Refreshtoken);
+        if (token) {
+          await API.refreshToken();
+          setHasToken(true);
+          console.log('Token refreshed');
+        }
+        else {
+          console.log('You need registration!');
+        }
+      }
+        catch (err) {
+            console.log(err);
+      }
+    }
+    else {
+      console.log('Time is not exit!');
+    }
+    enterUser();
+    setHasToken(true);
   };
 
-  const removeToken = async () => {
-      await AsyncStorage.removeItem('token');
-      await AsyncStorage.removeItem('refreshToken');
-      setUserToken(null);
-      setRefreshToken(null);
-  };
 
   const enterUser = async () => {
     const Data = await API.get(true, '/Auth/GetProfile');
@@ -93,6 +79,14 @@ export const AuthProvider = ({ children }) => {
           // setUserPhoto(userPhoto);
           // saveImageToLocalDirectory(userPhoto);
           setUserEntered(true);
+          getDataString('ProfilePhoto').then(photo => { 
+            if (photo)
+              setUserPhoto(photo);
+            else
+              setUserPhoto(null);
+          }).catch(error => {
+            console.error('Error loading ProfilePhoto line 88 AuthContext:', error);
+          });
     }
         else {
           setUserEntered(false);
@@ -102,7 +96,17 @@ export const AuthProvider = ({ children }) => {
   //Метод сохранения изображения в локальной директории
   const saveImageToLocalDirectory = async (uri) => {
     try {
-      const fileName = 'Profilephoto.png'; // Название файла, под которым он будет сохранен
+      const match = uri.match(/\.(\w+)$/);
+      const filename = userphoto.split('/').pop().split('.')[0];
+      console.log(`File name from uri: ${filename}`);
+      const fileExtension = match ? match[1] : null;
+      console.log('fileextension - ' + fileExtension);
+      let fileName = '';
+      if (filename == 'Profilephoto1')
+        fileName = 'Profilephoto2.' + fileExtension;
+      else
+        fileName = 'Profilephoto1.'+fileExtension;
+      // Название файла, под которым он будет сохранен
       const directory = FileSystem.documentDirectory + 'assets/images/';
       console.log("Directory is - "+directory);
       // Убедитесь, что директория существует, иначе создайте ее
@@ -112,12 +116,22 @@ export const AuthProvider = ({ children }) => {
       }
 
       const destPath = directory + fileName;
+      const fileInfo = await FileSystem.getInfoAsync(destPath);
+      if (fileInfo.exists) {
+        console.log('Image file exist line 113');
+        await FileSystem.deleteAsync(destPath);
+        const fileInfo2 = await FileSystem.getInfoAsync(destPath);
+        if (fileInfo2.exists)
+          console.log('Image file else exist line 116');
+      }
       await FileSystem.copyAsync({
         from: uri,
         to: destPath,
       });
       setUserPhoto(destPath);
       console.log(`Image saved to: ${destPath}`);
+      await new Promise(resolve => setTimeout(resolve, 3000)); // Задержка в 100ms
+      console.log(`Image from userPhoto in AuthContext line 111:  ${userphoto}`);
     } catch (error) {
       console.error('Error saving image:', error);
     }
@@ -127,7 +141,7 @@ export const AuthProvider = ({ children }) => {
   //Метод получения изображения из локальной директории
   const getImageFromLocalDirectory = async () => {
     try {
-      const fileName = 'Profilephoto.png'; // Название файла, которое нужно получить
+      const fileName = 'Profilephoto.jpg'; // Название файла, которое нужно получить
       const directory = FileSystem.documentDirectory + 'assets/images/';
       const filePath = directory + fileName;
       setUserPhoto(filePath);
@@ -157,7 +171,7 @@ export const AuthProvider = ({ children }) => {
       hasToken, saveImageToLocalDirectory, getImageFromLocalDirectory,
       username, userToken, refreshToken, firstname, lastname, phonenumber,
       birthdate, userphoto, email, userEntered, setUserEntered, setFirstName,
-      setLastName, setPhoneNumber, setEmail,
+      setLastName, setPhoneNumber, setEmail, enterUser, setUserPhoto
     }}>
       {children}
     </AuthContext.Provider>

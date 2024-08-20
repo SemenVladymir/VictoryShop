@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { View, Text, StyleSheet, Pressable, Image, ImageBackground} from 'react-native';
 import { DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer';
 import globalStyles from '../../screens/Other/styles';
@@ -8,10 +8,15 @@ import Icon from 'react-native-vector-icons/AntDesign';
 
 
 const CustomDrawerContent = (props) => {
-  const { username, firstname, lastname, email, userphoto, phonenumber } = useContext(AuthContext);
+  const { username, firstname, lastname, email, userphoto, phonenumber, userEntered } = useContext(AuthContext);
   const [isMenOpen, setMenOpen] = useState(false);
   const [isWomenOpen, setWomenOpen] = useState(false);
   const [isKidsOpen, setKidsOpen] = useState(false);
+
+
+  const Logout = async() => {
+    
+  };
 
   return (
     <DrawerContentScrollView {...props}
@@ -19,8 +24,9 @@ const CustomDrawerContent = (props) => {
       <ImageBackground source={require('../../assets/images/backgroun2.png')} style={{ padding: 10,  }}>
         <Pressable onPress={() => props.navigation.navigate('Enter')}>
           {userphoto ? <Image source={{ uri: userphoto }} style={{ height: 80, width: 80, borderRadius: 40, margin: 20 }} />
-            :
-          <Image source={require('../../assets/images/No_Image.jpg')} style={{ height: 80, width: 80, borderRadius: 40, margin: 20 }} />}
+          :
+            <Image source={require('../../assets/images/No_Image.jpg')} style={{ height: 80, width: 80, borderRadius: 40, margin: 20 }} />
+          }
           <Text style={[globalStyles.defaultText, { fontSize: 20, color: '#fff', marginBottom: 10, marginTop: -10 }]}>{firstname ? firstname : 'Вам необхідно увійти або зареєструватись'} {lastname ? lastname : null}</Text>
           <Text style={[globalStyles.defaultText, { fontSize: 16, color: '#fff' }]}>Login: {username ? username : 'None'}</Text>
           <Text style={[globalStyles.defaultText, { fontSize: 16, color: '#fff' }]}>Phone: { phonenumber ? phonenumber: 'None' }</Text>
@@ -128,6 +134,10 @@ const CustomDrawerContent = (props) => {
         label={()=><Text style={[globalStyles.boldText, styles.label]}>&#8226;  Знайти магазин</Text>}
         onPress={() => props.navigation.navigate('StoreLocator')}
       />
+      {/* <DrawerItem
+        label={()=><Text style={[globalStyles.boldText, styles.label]}>&#8226;  Вийти з обобистого запису</Text>}
+        onPress={Logout()}
+      /> */}
     </DrawerContentScrollView>
   );
 };

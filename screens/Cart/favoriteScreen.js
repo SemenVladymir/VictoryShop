@@ -9,6 +9,9 @@ import { ProductContext } from '../../store/ProductContext';
 import { useFocusEffect } from '@react-navigation/native';
 import { PanGestureHandler } from 'react-native-gesture-handler';
 
+// Используем локаль 'uk-UA' для форматирования цифр с разделение на порядки по-украински
+const formatNumber = (number) => { return number.toLocaleString('uk-UA'); };
+
 const FavoriteItem = ({ item, navigation, confirmDelete }) => {
   const translateX = useRef(new Animated.Value(0)).current;
 
@@ -75,14 +78,15 @@ const onHandlerStateChange = (event) => {
         <Pressable style={styles.itembody} onPress={() => navigation.navigate('ProductPage', { product: item })}>
           <View style={styles.imagebox}>
             <Image source={{ uri: item.photos[0].url }} style={styles.image} />
-            {item.discount && <Image source={require('../../assets/images/Discount.png')} style={styles.discountImage} />}
+            {item.discountId > 1 ? <Image source={require('../../assets/images/Discount.png')} style={styles.discountImage} /> : null}
           </View>
           <View style={styles.info}>
             <Text style={[globalStyles.boldText, styles.name]}>{item.name}</Text>
             <Text style={[globalStyles.defaultText, styles.cathegory]}>{item.cathegory}</Text>
-            <Text style={[globalStyles.boldText, item.discount ? styles.priceDiscount : styles.price]}>
-              {item.price} грн.
-            </Text>
+            {item.discountId > 1 ?
+            <Text style={[globalStyles.boldText, styles.priceDiscount]}>{formatNumber(item.price)} грн.</Text>
+            :
+            <Text style={[globalStyles.boldText, styles.price]}>{formatNumber(item.price)} грн.</Text>}
           </View>
           <View style={styles.favoriteIcon}>
             <Image source={require('../../assets/images/favoriteheart.png')} style={styles.favoriteImage} />
@@ -121,7 +125,7 @@ export default function FavoritesScreen({ navigation }) {
     <BackHandlerWrapper navigation={navigation}>
       <SafeAreaView style={styles.container}>
         <Header />
-        {favorites ? (
+        {favorites.length > 0 ? (
           <>
             <View style={styles.title}>
               <Text style={[globalStyles.boldText, styles.titletext]}>Обрані товари</Text>

@@ -7,83 +7,83 @@ import { ProductContext } from '../../store/ProductContext';
 import Product from '../../components/Product/Product';
 
 
-const data = [
-    {
-      id: '1',
-      name: 'Шорти Nike M NK CLUB ALUMNI HBR FT SHORT 166012',
-      discount: '20%',
-      cathegory: 'для чоловіків',
-      price: '4 479 грн',
-      image: 'https://megasport.ua/api/s3/images/megasport-dev/products/3555570144/667a7fa87fc27-68e7b68.jpeg',
-    },
-    {
-      id: '2',
-        name: 'Сумка Nike Elemental Premium 165572',
-        cathegory: 'для жінок',
-        price: '1789 грн',
-        image: 'https://megasport.ua/api/s3/images/megasport-dev/products/3555570144/6638871f8621f-68e7b68.jpeg',
-        discount: null,
-    },
-    {
-        id: '3',
-        name: 'Кроссовки NIKE COURT VISION LOW NN',
-        cathegory: 'для жінок',
-        price: '4 479 грн',
-        image: '../../assets/images/ProductImage.png',
-        discount: null,
-      },
-      {
-        id: '4',
-        name: 'Спортивный костюм ISSA PLUS 13485',
-        cathegory: 'для жінок',
-        price: '799 грн',
-        image: '../../assets/images/ProductImage1.png',
-        discount: null,
-    },
-    {
-        id: '5',
-        name: 'Кроссовки NIKE COURT VISION LOW NN',
-        cathegory: 'для жінок',
-        price: '4 479 грн',
-        image: '../../assets/images/ProductImage.png',
-        discount: null,
-      },
-      {
-        id: '6',
-          name: 'Спортивный костюм ISSA PLUS 13485',
-          cathegory: 'для жінок',
-        price: '799 грн',
-        image: '../../assets/images/ProductImage1.png',
-    },
-    {
-        id: '7',
-        name: 'Кроссовки NIKE COURT VISION LOW NN',
-        cathegory: 'для жінок',
-        price: '4 479 грн',
-        image: '../../assets/images/ProductImage.png',
-      },
-      {
-        id: '8',
-          name: 'Спортивный костюм ISSA PLUS 13485',
-          cathegory: 'для жінок',
-        price: '799 грн',
-        image: '../../assets/images/ProductImage1.png',
-    },
-    {
-        id: '9',
-        name: 'Кроссовки NIKE COURT VISION LOW NN',
-        cathegory: 'для жінок',
-        price: '4 479 грн',
-        image: '../../assets/images/ProductImage.png',
-      },
-      {
-        id: '10',
-          name: 'Спортивный костюм ISSA PLUS 13485',
-          cathegory: 'для жінок',
-        price: '799 грн',
-        image: '../../assets/images/ProductImage1.png',
-      },
-  ];
+// const data = [
+//     {
+//       id: '1',
+//       name: 'Шорти Nike M NK CLUB ALUMNI HBR FT SHORT 166012',
+//       discount: '20%',
+//       cathegory: 'для чоловіків',
+//       price: '4 479 грн',
+//       image: 'https://megasport.ua/api/s3/images/megasport-dev/products/3555570144/667a7fa87fc27-68e7b68.jpeg',
+//     },
+//     {
+//       id: '2',
+//         name: 'Сумка Nike Elemental Premium 165572',
+//         cathegory: 'для жінок',
+//         price: '1789 грн',
+//         image: 'https://megasport.ua/api/s3/images/megasport-dev/products/3555570144/6638871f8621f-68e7b68.jpeg',
+//         discount: null,
+//     },
+//     {
+//         id: '3',
+//         name: 'Кроссовки NIKE COURT VISION LOW NN',
+//         cathegory: 'для жінок',
+//         price: '4 479 грн',
+//         image: '../../assets/images/ProductImage.png',
+//         discount: null,
+//       },
+//       {
+//         id: '4',
+//         name: 'Спортивный костюм ISSA PLUS 13485',
+//         cathegory: 'для жінок',
+//         price: '799 грн',
+//         image: '../../assets/images/ProductImage1.png',
+//         discount: null,
+//     },
+//     {
+//         id: '5',
+//         name: 'Кроссовки NIKE COURT VISION LOW NN',
+//         cathegory: 'для жінок',
+//         price: '4 479 грн',
+//         image: '../../assets/images/ProductImage.png',
+//         discount: null,
+//       },
+//       {
+//         id: '6',
+//           name: 'Спортивный костюм ISSA PLUS 13485',
+//           cathegory: 'для жінок',
+//         price: '799 грн',
+//         image: '../../assets/images/ProductImage1.png',
+//     },
+//     {
+//         id: '7',
+//         name: 'Кроссовки NIKE COURT VISION LOW NN',
+//         cathegory: 'для жінок',
+//         price: '4 479 грн',
+//         image: '../../assets/images/ProductImage.png',
+//       },
+//       {
+//         id: '8',
+//           name: 'Спортивный костюм ISSA PLUS 13485',
+//           cathegory: 'для жінок',
+//         price: '799 грн',
+//         image: '../../assets/images/ProductImage1.png',
+//     },
+//     {
+//         id: '9',
+//         name: 'Кроссовки NIKE COURT VISION LOW NN',
+//         cathegory: 'для жінок',
+//         price: '4 479 грн',
+//         image: '../../assets/images/ProductImage.png',
+//       },
+//       {
+//         id: '10',
+//           name: 'Спортивный костюм ISSA PLUS 13485',
+//           cathegory: 'для жінок',
+//         price: '799 грн',
+//         image: '../../assets/images/ProductImage1.png',
+//       },
+//   ];
 
 const ProductItem = ({ route }) => {
   const navigation = useNavigation();
@@ -122,7 +122,7 @@ const ProductItem = ({ route }) => {
     }
     else
       setCatalog(products);
-  }, [searchproducts, filter]);
+  }, [searchproducts, filter, products]);
 
   const ProductItem = React.memo(({ item }) => {
     return (
@@ -131,6 +131,7 @@ const ProductItem = ({ route }) => {
       </View>
     );
   });
+  
     
   return (
     <SafeAreaView style={styles.container}>
@@ -147,6 +148,7 @@ const ProductItem = ({ route }) => {
             keyExtractor={item => item.id.toString()}
             numColumns={2}
             contentContainerStyle={styles.list}
+            removeClippedSubviews
         />
 
         </SafeAreaView>
@@ -176,14 +178,15 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     backgroundColor: '#4748FF',
     borderRadius: 25,
-    width: '30%',
+    width: '40%',
+    height: 40,
     alignItems: 'center',
   },
   buttonText: {
     color: '#fff',
     fontSize: 16,
-    paddingTop: 8,
-    paddingBottom: 12,
+    paddingTop: 6,
+    paddingBottom: 10,
   },
   text: {
     fontSize: 16,

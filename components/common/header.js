@@ -1,10 +1,7 @@
-// components/Header.js
 import React, {useState, useEffect, useContext, useCallback } from 'react';
 import { View, Text, StyleSheet,  Pressable, Image, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import globalStyles from '../../screens/Other/styles';
 import { Icon } from 'react-native-elements';
-//import { Provider as PaperProvider, Menu, Button } from 'react-native-paper';
 import { OrderContext } from '../../store/OrderContext';
 import { AuthContext } from '../../store/AuthContext';
 import { useFocusEffect } from '@react-navigation/native';
@@ -12,7 +9,7 @@ import { useFocusEffect } from '@react-navigation/native';
 const Header = ({ onlyLOGO }) => {
   const navigation = useNavigation();
   const { actualOrders, getActualOrders } = useContext(OrderContext);
-  const { userEntered, getImageFromLocalDirectory } = useContext(AuthContext);
+  const { userEntered, userphoto } = useContext(AuthContext);
 
   const [visible, setVisible] = useState(false);
   const [cartCount, setCartCount] = useState(0);
@@ -23,52 +20,53 @@ const Header = ({ onlyLOGO }) => {
 
   useFocusEffect(
     useCallback(() => {
-      getActualOrders().then(orders => {
-        if (orders)
-          setCartCount(orders.length);
-        else
-          setCartCount(null);
-      })
-      .catch(error => {
-        console.error('Error loading orders:', error);
-        navigation.navigate('Error');
-      });
       if (userEntered)
       {
-        getImageFromLocalDirectory().then(response => {
-          setImageUri(response);
-        }).catch(error => {
+        getActualOrders().then(orders => {
+          if (orders)
+            setCartCount(orders.length);
+          else
+            setCartCount(null);
+        })
+        .catch(error => {
           console.error('Error loading orders:', error);
           navigation.navigate('Error');
         });
+        setImageUri(userphoto);
       }
       else
-      setImageUri(null);
+        setImageUri(null);
     }, [])
   );
 
   useEffect(() => {
-    if (actualOrders)
+    if (actualOrders && userEntered) {
       setCartCount(actualOrders.length);
-    else
+      setImageUri(userphoto);
+    }
+    else if (userEntered)
+      setImageUri(userphoto);
+    else {
       setCartCount(0);
-  }, [actualOrders]);
+      setImageUri(null);
+    }
+  }, [actualOrders, userEntered, userphoto]);
 
 
   return (
     <SafeAreaView style={{marginTop: 45}}>
       <View style={!onlyLOGO ? styles.header : styles.headerwithoutlogo}>
-      <View style={styles.logoContainer}>
-      <Pressable onPress={() => navigation.navigate('Main')}>
-        <Image source={require('../../assets/images/Logo.png')} style={styles.image} />
-      </Pressable>
-      </View>
+        <View style={styles.logoContainer}>
+          <Pressable onPress={() => navigation.navigate('Main')}>
+            <Image source={require('../../assets/images/Logo.png')} style={styles.image} />
+          </Pressable>
+        </View>
       {!onlyLOGO ? (
         <View style={styles.icons}>
           <Pressable onPress={() => navigation.navigate('Favorites')}>
               <Icon name="favorite-border" size={30} color="#000" />
           </Pressable>
-          <Pressable onPress={() => navigation.navigate('Cart')}>
+          <Pressable onPress={() => userEntered ? navigation.navigate('Cart') : navigation.navigate('Enter')}>
             <Icon name="shopping-cart" size={30} color="#000" />
             {cartCount > 0 ? <>
               <View style={styles.badge}>
@@ -79,22 +77,17 @@ const Header = ({ onlyLOGO }) => {
           <Pressable onPress={() => navigation.navigate('Search')}>
               <Icon name="search" size={30} color="#000" />
           </Pressable>
-          <Pressable onPress={() => navigation.navigate('Profile')}>
-              {imageUri ? <Image source={{ uri: imageUri }} style={styles.profileImage} />
-              : <Icon name="person" size={30} color="#000" />}
+          <Pressable onPress={() => userEntered ? navigation.navigate('Profile') : navigation.navigate('Enter')}>
+              {userphoto ? <Image source={{ uri: userphoto }} style={styles.profileImage} />
+              :
+                <Icon name="person" size={30} color="#000" />
+              }
           </Pressable>
 
-          {/*----------------Dropdawn menu------------------- */}
           <Pressable
-            // onPress={() => navigation.navigate('AppBar')}
             onPress={() => navigation.toggleDrawer()}>
               <Icon name="menu" size={25} color="#000" />
           </Pressable>
-          {/* <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            <Text>{ this.props.name}</Text>
-          </View> */}
-
-
         </View>
       ):(<Text></Text>)}
       </View>
@@ -135,26 +128,14 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
   },
   icons: {
-    width: '70%',
+    width: '73%',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    },
+    marginRight: 10,
+  },
   logoContainer: {
-        alignItems: 'start',
-    },
-  logo: {
-        fontSize: 20,
-        fontWeight: '400',
-        color: '#FFC700',
-        backgroundColor: '#4748FF',
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        justifyContent: 'flex-start',
-      },
-  headerText: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    alignItems: 'start',
   },
   badge: {
     position: 'absolute',
@@ -170,7 +151,6 @@ const styles = StyleSheet.create({
   badgeText: {
     color: 'white',
     fontSize: 12,
-    fontWeight: 'bold',
   },
 });
 

@@ -8,7 +8,7 @@ import { AuthContext } from '../../store/AuthContext';
 import { StackActions } from '@react-navigation/native';
 
 export default function Login({ navigation }) {
-  const { setUserEntered } = useContext(AuthContext);
+  const { enterUser } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
   const [username, setUserName] = useState('');
   const [password, setPassword] = useState('');
@@ -27,7 +27,8 @@ export default function Login({ navigation }) {
         Alert.alert('Ви ввели невірні дані, спробуйте ще раз!')
       else {
         console.log("Login OK");
-        setUserEntered(true);
+        await enterUser();
+        // setUserEntered(true);
         navigation.navigate('Main');
         // navigation.navigate('Main');
       }

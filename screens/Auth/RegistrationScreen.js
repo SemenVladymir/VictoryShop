@@ -21,23 +21,17 @@ const RegistrationScreen = ({navigation}) => {
       });
 
   const handleRegister = async (values) => {
-    // Логика регистрации пользователя
       console.log('Регистрация', values);
     try {
         await API.register(values.username, values.password, values.email, 'User', values.birthDate, values.firstname, values.lastname);
         //navigation.navigate('Home');
           console.log("You Registered");
-                    
+          Alert.alert('Прийнято', 'Ви зареєструвалися!');
           navigation.navigate('Login');
       } catch (err) {
           console.log(`login error: ${err}`);
           setError('Login failed');
       }
-      finally {
-        setLoading(false);
-      }
-
-    Alert.alert('Прийнято', 'Ви зареєструвалися!');
   };
 
   return (

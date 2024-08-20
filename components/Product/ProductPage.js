@@ -8,12 +8,15 @@ import Product from './Product';
 import { addNewData } from '../../services/AsyncStorageUtil';
 import { OrderContext } from '../../store/OrderContext';
 import { useNavigation } from '@react-navigation/native';
+import { AuthContext } from '../../store/AuthContext';
+import Toast from 'react-native-toast-message';
 
 
 export default function ProductPage({ route }) {
   const navigation = useNavigation();
+  const { userEntered } = useContext(AuthContext);
   const { products, countries, colors, brands, genders, discounts } = useContext(ProductContext);
-  const { saveNewOrder } = useContext(OrderContext);
+  const { saveNewOrder, getActualOrders, changeOrder } = useContext(OrderContext);
   const formatNumber = (number) => { return number.toLocaleString('uk-UA'); };
   const { product } = route.params;
   const [selectedImage, setSelectedImage] = useState('');
@@ -27,19 +30,53 @@ export default function ProductPage({ route }) {
     setSelectedSizeId(null);
   }, [product.photos]);
 
+  const showMessage = (message) => {
+    Toast.show({
+      type: 'info', // или 'error', 'info'
+      text1: message,
+      visibilityTime: 1000, // Время отображения в миллисекундах
+    });
+  };
+
   const handlePress = (id) => {
     setSelectedSizeId(id);
   };
 
   const handleFavorite = async (item) => {
-    addNewData('Favorites', item.id)
-    console.log('Add to Favorite');
+    if (userEntered) {
+      await addNewData('Favorites', item.id)
+      console.log('Add to Favorite');
+      showMessage('Товар додано до улюблених!');
+      // return (
+      //   <Toast ref={(ref) => Toast.setRef(ref)}/>
+      // );
+
+    }
+    else
+      navigation.navigate('Enter');
   };
 
   const handleCart = (item) => {
-    saveNewOrder(item.id);
-    console.log('Go to Cart');
-    // navigation.navigate('Cart');
+    if (userEntered) {
+      getActualOrders().then(orders => {
+        if (orders) {
+          const hasOrder = orders.find(e => e.productId == item.id);
+          console.log('Checking new order if he has in cart (ProductPage line 64 ) - '+hasOrder)
+          if (hasOrder)
+              changeOrder(hasOrder, 2, hasOrder.amount + 1);
+          else
+              saveNewOrder(item.id);
+        }
+      })
+      .catch(error => {
+          console.error('Error loading orders:', error);
+          navigation.navigate('Error');
+      });
+      console.log('Go to Cart');
+      // navigation.navigate('Cart');
+    }
+    else
+    navigation.navigate('Enter');
   };
 
   const getCountry = (product) => {
