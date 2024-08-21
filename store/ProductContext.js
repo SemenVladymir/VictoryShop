@@ -76,9 +76,10 @@ const loadArray = async (key, update = false) => {
         //   ArrayData = JSON.parse(productArrayString);
         // console.log('1. Count products in AsyncStorage - ' + ArrayData.length);
         if (ArrayData == null || ArrayData.length == 0 || update) {
-          console.log('2. Count products in AsyncStorage - ' + ArrayData.length);
+          console.log('1. Enter in get products');
           // console.log('GenderId in 3 product in AsyncStorage - ' + ArrayData[2].genderId);
           ArrayData = await API.get(false, '/Product/GetAllProducts');
+          console.log('2. Get products from SQL-basa');
           // const initialProducts = ArrayData.slice(0, 20);
           return await Promise.all(ArrayData.map(async (Data) => {
             const product = new Product(Data.Id, Data.Name, Data.Description, Data.Price, [],

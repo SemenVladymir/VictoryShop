@@ -137,9 +137,7 @@ export default function OrderScreen({ navigation}) {
       console.log('All actual Orders from orderscreen ' + orders);
       if (orders) {
         for (const item of orderProducts) {
-          // console.log('Product from order screen ' + item);
           var order = orders.find(e => e.productId == item.id);
-          // console.log('Order for change - ' + order);
           changeOrder(order, 3, 1);
           createDelivery(order.id, 2, `${country}, ${address}, ${postalCode}`, organization);
           createPayment(order.id, item.price, 2, item.quantity);

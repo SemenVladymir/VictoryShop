@@ -8,7 +8,7 @@ import { useFocusEffect } from '@react-navigation/native';
 
 const Header = ({ onlyLOGO }) => {
   const navigation = useNavigation();
-  const { actualOrders, getActualOrders } = useContext(OrderContext);
+  const { actualOrders, getActualOrders, countActualOrders } = useContext(OrderContext);
   const { userEntered, userphoto } = useContext(AuthContext);
 
   const [visible, setVisible] = useState(false);
@@ -41,7 +41,8 @@ const Header = ({ onlyLOGO }) => {
 
   useEffect(() => {
     if (actualOrders && userEntered) {
-      setCartCount(actualOrders.length);
+      // setCartCount(actualOrders.length);
+      setCartCount(countActualOrders);
       setImageUri(userphoto);
     }
     else if (userEntered)
@@ -50,7 +51,7 @@ const Header = ({ onlyLOGO }) => {
       setCartCount(0);
       setImageUri(null);
     }
-  }, [actualOrders, userEntered, userphoto]);
+  }, [countActualOrders, userEntered, userphoto]);
 
 
   return (

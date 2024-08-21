@@ -141,6 +141,7 @@ const createPayment = async (OrderId, Summ, StatusId=2, Amount) => {
 };
 
 const OrderProvider = ({ children }) => {
+  const [countActualOrders, setCountActualOrders] = useState('');
   const [orders, setOrders] = useState([]);
   const [statuses, setStatuses] = useState([]);
   const [actualOrders, setActualOrders] = useState([]);
@@ -159,13 +160,14 @@ const OrderProvider = ({ children }) => {
             getAllOrders(),
             fetchData('/Order/GetAllStatuses', 'Status', Status),
             getActualOrders(),
-          ]);
 
+          ]);
           setOrders(orderList);
           saveArrayToAsyncStorage('Order', orders);
           setStatuses(statusList);
           saveArrayToAsyncStorage('Status', statuses);
           setActualOrders(actualOrderList);
+          setCountActualOrders(actualOrders.length);
         }
       } catch (error) {
         console.error('Error loading product data', error);
@@ -181,7 +183,7 @@ const OrderProvider = ({ children }) => {
   return (
     <OrderContext.Provider value={{
       orders, statuses, actualOrders, saveNewOrder, createDelivery, createPayment,
-      changeOrder, getActualOrders, getAllOrders, setActualOrders,
+      changeOrder, getActualOrders, getAllOrders, setActualOrders, countActualOrders, setCountActualOrders,
     }}>
       {children}
     </OrderContext.Provider>

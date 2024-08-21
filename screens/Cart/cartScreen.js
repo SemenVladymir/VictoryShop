@@ -57,7 +57,7 @@ const CartItem = ({ item, onIncrease, onDecrease, onRemove }) => {
 
 
 export default function CartScreen({ navigation }) {
-  const { setActualOrders, getActualOrders, changeOrder } = useContext(OrderContext);
+  const { setActualOrders, getActualOrders, changeOrder, setCountActualOrders } = useContext(OrderContext);
   const { products } = useContext(ProductContext);
   const [cart, setCart] = useState([]);
 
@@ -173,6 +173,7 @@ export default function CartScreen({ navigation }) {
       const deleteorder = orders.find(e => e.productId == id);
       changeOrder(deleteorder, 4, 1);
       setActualOrders(cart);
+      setCountActualOrders(orders.length - 1);
       console.log('Order deleted');
   })
   .catch(error => {
