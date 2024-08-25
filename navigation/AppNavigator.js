@@ -30,6 +30,7 @@ import Filter from '../screens/Cart/FilterScreen';
 import Order from '../screens/Order/OrderScreen';
 import Help from '../screens/Other/HelpScreen';
 import GiftCards from '../screens/Other/GiftCardScreen';
+import OrderTable from '../screens/Order/OrdersStatusScreen';
 import { View, StyleSheet } from 'react-native';
 
 
@@ -99,7 +100,8 @@ return (
           <Drawer.Screen name="Filter" component={Filter} />
           <Drawer.Screen name="Help" component={Help} />
           <Drawer.Screen name="GiftCards" component={GiftCards} />
-          {renderScreen("Order", Order)}
+        {renderScreen("Order", Order)}
+        {renderScreen("OrderTable", OrderTable)}
         </Drawer.Navigator>
       </BackHandlerWrapper>
     </NavigationContainer>

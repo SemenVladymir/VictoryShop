@@ -27,7 +27,7 @@ const Main = () => {
           <Text style={[globalStyles.defaultText, styles.bodyText2]}>{`Знижка до 70%\n на весь асортимент спортивних товарів!`}</Text>
           
           <Pressable style={styles.button} onPress={() => navigation.navigate('Catalog')}>
-            <Text style={[globalStyles.defaultText, styles.buttonText]}>До покупок</Text>
+            <Text style={[globalStyles.defaultText, styles.buttonText]}>До каталогу</Text>
           </Pressable>
         </View>
         
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: 390,
+    height: 410,
     resizeMode: 'contain',
     marginBottom: 15,
   },
@@ -84,9 +84,10 @@ const styles = StyleSheet.create({
   bodyText1: {
     textAlign: 'center',
     fontSize: 20,
+    marginVertical: 10,
   },
   bodyText2: {
-    marginTop: 10,
+    marginVertical: 10,
     textAlign: 'center',
     fontWeight: '400',
     fontSize: 14,

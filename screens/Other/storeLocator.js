@@ -10,10 +10,10 @@ const StoreLocator = () => {
   const [errorMsg, setErrorMsg] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [stores, setStores] = useState([
-    { id: 1, name: 'Planet sport', address: 'м.Дніпро, вул. Ірпінська, 2', work: 'Працює з 9:00 до 18:00 без вихідних', latitude: 48.42682077320352, longitude: 35.03111805728757 },
-    { id: 2, name: 'Planet sport', address: 'м.Дніпро, вул. Яворницького, 57', work: 'Працює з 10:00 до 21:00 без вихідних', latitude: 48.459686222442215, longitude: 35.056216072033436 },
-    { id: 3, name: 'Planet sport', address: 'м.Дніпро, вул. Малиновського, 33', work: 'Працює з 9:00 до 19:00 без вихідних', latitude: 48.479947665601856, longitude: 35.07267446829191 },
-    { id: 4, name: 'Planet sport', address: 'м.Дніпро, вул. Незламна, 104', work: 'Працює з 9:00 до 18:00 без вихідних', latitude: 48.52945607807129, longitude: 34.98847835256279 },
+    { id: 1, name: 'Planet sport Irpinska', address: 'м.Дніпро, вул. Ірпінська, 2', work: 'Працює з 9:00 до 18:00 без вихідних', latitude: 48.42682077320352, longitude: 35.03111805728757 },
+    { id: 2, name: 'Planet sport Yavornitskogo', address: 'м.Дніпро, вул. Яворницького, 57', work: 'Працює з 10:00 до 21:00 без вихідних', latitude: 48.459686222442215, longitude: 35.056216072033436 },
+    { id: 3, name: 'Planet sport Malinovskogo', address: 'м.Дніпро, вул. Малиновського, 33', work: 'Працює з 9:00 до 19:00 без вихідних', latitude: 48.479947665601856, longitude: 35.07267446829191 },
+    { id: 4, name: 'Planet sport Nezlamna', address: 'м.Дніпро, вул. Незламна, 104', work: 'Працює з 9:00 до 18:00 без вихідних', latitude: 48.52945607807129, longitude: 34.98847835256279 },
     // Add more stores with their coordinates
   ]);
 

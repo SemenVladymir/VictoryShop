@@ -12,8 +12,8 @@ class API {
     this.baseUrl = 'http://192.168.0.110:5156/api'
     this.headers = {
       'Content-Type': 'application/json',
-      'charset': 'utf-8',
-      'X-Content-Type-Options': 'no-sniff',
+      // 'charset': 'utf-8',
+      // 'X-Content-Type-Options': 'no-sniff',
     };
     return this;
   }

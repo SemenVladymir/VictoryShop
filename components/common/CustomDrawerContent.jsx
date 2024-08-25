@@ -134,6 +134,10 @@ const CustomDrawerContent = (props) => {
         label={()=><Text style={[globalStyles.boldText, styles.label]}>&#8226;  Знайти магазин</Text>}
         onPress={() => props.navigation.navigate('StoreLocator')}
       />
+      <DrawerItem
+        label={()=><Text style={[globalStyles.boldText, styles.label]}>&#8226;  Мої замовлення</Text>}
+        onPress={() => props.navigation.navigate('OrderTable')}
+      />
       {/* <DrawerItem
         label={()=><Text style={[globalStyles.boldText, styles.label]}>&#8226;  Вийти з обобистого запису</Text>}
         onPress={Logout()}

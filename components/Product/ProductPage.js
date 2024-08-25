@@ -16,7 +16,7 @@ export default function ProductPage({ route }) {
   const navigation = useNavigation();
   const { userEntered } = useContext(AuthContext);
   const { products, countries, colors, brands, genders, discounts } = useContext(ProductContext);
-  const { saveNewOrder, getActualOrders, changeOrder, countActualOrders, setCountActualOrders } = useContext(OrderContext);
+  const { saveNewOrder, getActualOrders, changeOrder, setCountActualOrders } = useContext(OrderContext);
   const formatNumber = (number) => { return number.toLocaleString('uk-UA'); };
   const { product } = route.params;
   const [selectedImage, setSelectedImage] = useState('');
