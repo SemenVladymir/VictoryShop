@@ -1,6 +1,6 @@
 class Product {
-  constructor(Id, Name, Description, Price, Photos, CathegoryId, DiscountId,
-    IsAvailable, CountryId, BrandId, GenderId, SubcathegoryId, SportId, ColorId, ListOfSize) {
+  constructor(Id, Name, Description, Price, Photos = [], CathegoryId, DiscountId,
+    IsAvailable, CountryId, BrandId, GenderId, SubcathegoryId, SportId, ColorId, ListOfSize = []) {
     this.id = Id;
     this.name = Name;
     this.description = Description;

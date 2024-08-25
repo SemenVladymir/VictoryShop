@@ -73,11 +73,12 @@ return (
             <CustomDrawerContent {...props} />
           </View>
           )}
-          screenOptions={{
+        screenOptions={{
             drawerPosition: 'right',
             headerShown: false,
             drawerStyle: { right: 0, width: 330 },
-            drawerActiveBackgrondColor: '#4748FF',
+            // drawerActiveBackgrondColor: '#4748FF',
+            // drawerActiveTintColor: '#fff',
             gestureEnabled: false,
           }}
         >

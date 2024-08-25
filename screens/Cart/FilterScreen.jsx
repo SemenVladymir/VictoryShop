@@ -216,10 +216,10 @@ const clearFilters = () => {
           </Pressable>
       </View>
       <View style={styles.buttons}>
-        <Pressable style={[styles.buttonShadow, styles.buttonFind]} onPress={handleClearFilters}>
+        <Pressable style={[styles.buttonShadow, styles.buttonClear]} onPress={handleClearFilters}>
             <Text style={[globalStyles.defaultText, styles.buttonText]}>Очистити</Text>
         </Pressable>
-        <Pressable style={[styles.buttonShadow, styles.buttonHome]} onPress={handleUseFilters}>
+        <Pressable style={[styles.buttonShadow, styles.buttonFilter]} onPress={handleUseFilters}>
             <Text style={[globalStyles.defaultText, styles.buttonTextHome]}>Застосувати</Text>
         </Pressable>
       </View>
@@ -434,7 +434,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
 },
-buttonFind: {
+buttonClear: {
   backgroundColor: '#4748FF',
   fontSize: 16,
   paddingHorizontal: 12,
@@ -444,7 +444,7 @@ buttonFind: {
   width: '45%',
   alignItems: 'center',
 },
-buttonHome: {
+buttonFilter: {
   backgroundColor: '#FFC700',
   fontSize: 16,
   paddingHorizontal: 12,

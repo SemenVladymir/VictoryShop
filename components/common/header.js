@@ -2,6 +2,8 @@ import React, {useState, useEffect, useContext, useCallback } from 'react';
 import { View, Text, StyleSheet,  Pressable, Image, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Icon } from 'react-native-elements';
+import Icon2 from 'react-native-vector-icons/FontAwesome';
+import Icon3 from 'react-native-vector-icons/AntDesign';
 import { OrderContext } from '../../store/OrderContext';
 import { AuthContext } from '../../store/AuthContext';
 import { useFocusEffect } from '@react-navigation/native';
@@ -14,8 +16,6 @@ const Header = ({ onlyLOGO }) => {
   const [visible, setVisible] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const [imageUri, setImageUri] = useState(null);
-  const openMenu = () => setVisible(true);
-  const closeMenu = () => setVisible(false);
 
 
   useFocusEffect(
@@ -68,7 +68,8 @@ const Header = ({ onlyLOGO }) => {
               <Icon name="favorite-border" size={30} color="#000" />
           </Pressable>
           <Pressable onPress={() => userEntered ? navigation.navigate('Cart') : navigation.navigate('Enter')}>
-            <Icon name="shopping-cart" size={30} color="#000" />
+              {/* <Icon name="shopping-cart" size={30} color="#000" /> */}
+              <Icon2 name="shopping-basket" size={23} color="#000" />
             {cartCount > 0 ? <>
               <View style={styles.badge}>
                 <Text style={styles.badgeText}>{cartCount}</Text>
@@ -76,7 +77,7 @@ const Header = ({ onlyLOGO }) => {
             </>:null}
           </Pressable>
           <Pressable onPress={() => navigation.navigate('Search')}>
-              <Icon name="search" size={30} color="#000" />
+              <Icon3 name="search1" size={30} color="#000" />
           </Pressable>
           <Pressable onPress={() => userEntered ? navigation.navigate('Profile') : navigation.navigate('Enter')}>
               {userphoto ? <Image source={{ uri: userphoto }} style={styles.profileImage} />

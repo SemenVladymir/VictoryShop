@@ -71,54 +71,39 @@ const loadArray = async (key, update = false) => {
     switch (key)
     {
       case 'Product':
-        // ArrayData = await getData('Product');
-        // if (productArrayString != null)
-        //   ArrayData = JSON.parse(productArrayString);
-        // console.log('1. Count products in AsyncStorage - ' + ArrayData.length);
         if (ArrayData == null || ArrayData.length == 0 || update) {
-          console.log('1. Enter in get products');
-          // console.log('GenderId in 3 product in AsyncStorage - ' + ArrayData[2].genderId);
-          ArrayData = await API.get(false, '/Product/GetAllProducts');
-          console.log('2. Get products from SQL-basa');
+          console.log('1. Enter in get products '+Date());
+          ArrayData = await API.get(false, '/Product/GetAllProducts2');
+          console.log('2. Get products from SQL-basa '+Date());
           // const initialProducts = ArrayData.slice(0, 20);
-          return await Promise.all(ArrayData.map(async (Data) => {
-            const product = new Product(Data.Id, Data.Name, Data.Description, Data.Price, [],
+          const products = await Promise.all(ArrayData.map(async (Data) => {
+            const product = new Product(Data.Id, Data.Name, Data.Description, Data.Price,
+              Data.Photos.map(photo => new Photo(photo.Id, photo.URL, photo.ProductId, photo.Details)),
               Data.CathegoryId, Data.DiscountId, Data.IsAvailable, Data.CountryId, Data.BrandId, Data.GenderId,
-              Data.SubcathegoryId, Data.SportId, Data.ColorId, []);
-            const photos = await getPhotos(product.id);
-            const sizes = await getSizes(product.id);
-            if (photos)
-              product.photos = photos;
-            if (sizes)
-              product.sizes = sizes;
+              Data.SubcathegoryId, Data.SportId, Data.ColorId,
+              Data.ListOfSizes.map(size => new Size(size.Id, size.InternationalName, size.LocalName)));
             return product;
           }
           ));
+          console.log('3. Get products from SQL-basa '+Date());
+          return products;
         }
       
       
       case 'Subcathegory':
         ArrayData = await getData('Subcathegory');
-        // if (subcathegoryArrayString != null)
-        //   ArrayData = JSON.parse(subcathegoryArrayString);
         if (ArrayData == null || ArrayData.length == 0 || update)
           ArrayData = await API.get(false, '/Product/GetAllSubcathegories');
         return ArrayData.map(Data => new Subcathegory(Data.Id, Data.Name, Data.CathegoryId));
       
       
       case 'Discount':
-        // console.log('Discount');
         ArrayData = await getData('Discount');
-        // if (discountArrayString != null) {
-        //   ArrayData = JSON.parse(discountArrayString);
-          // console.log(ArrayData);
-        // }
         if (ArrayData == null || ArrayData.length == 0 || update)
           ArrayData = await API.get(false, '/Product/GetAllDiscounts');
-        // console.log(ArrayData);
         return ArrayData.map(Data => new Discount(Data.Id, Data.Name, Data.StartDate, Data.EndDate, Data.Percent));
     }
-    return []; // Если данных нет, возвращаем пустой массив
+    return [];
   } catch (error) {
     console.error('Error loading product array:', error);
     return [];

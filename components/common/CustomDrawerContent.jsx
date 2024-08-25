@@ -21,7 +21,7 @@ const CustomDrawerContent = (props) => {
   return (
     <DrawerContentScrollView {...props}
       contentContainerStyle={{ backgroundColor: '#FFC700' }}>
-      <ImageBackground source={require('../../assets/images/backgroun2.png')} style={{ padding: 10,  }}>
+      <ImageBackground source={require('../../assets/images/backgroun2.png')} style={{ paddingHorizontal: 10, paddingBottom: 10 }}>
         <Pressable onPress={() => props.navigation.navigate('Enter')}>
           {userphoto ? <Image source={{ uri: userphoto }} style={{ height: 80, width: 80, borderRadius: 40, margin: 20 }} />
           :

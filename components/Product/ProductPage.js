@@ -113,11 +113,11 @@ export default function ProductPage({ route }) {
               
         <View style={styles.priceContainer}>
         {getDiscount(product) > 0 ? <>
-              <Text style={[globalStyles.boldText, styles.newPrice]}>{formatNumber(product.price)} грн  </Text>
+              <Text style={[globalStyles.boldText, styles.newPrice]}>{formatNumber(Math.round(product.price))} грн  </Text>
               <Text>          </Text>
-          <Text style={[globalStyles.defaultText, styles.oldPrice]}>{formatNumber(product.price/(100 - getDiscount(product))*100)} грн</Text> 
+          <Text style={[globalStyles.defaultText, styles.oldPrice]}>{formatNumber(Math.round(product.price/(100 - getDiscount(product))*100))} грн</Text> 
         </> :
-            <Text style={[globalStyles.boldText, styles.Price]}>{formatNumber(product.price)} грн</Text>
+            <Text style={[globalStyles.boldText, styles.Price]}>{formatNumber(Math.round(product.price))} грн</Text>
         }
         </View>
           

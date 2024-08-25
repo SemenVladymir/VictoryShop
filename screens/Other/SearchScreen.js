@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { View, Text, TextInput, StyleSheet, Pressable, Image } from 'react-native';
-import { Icon } from'react-native-elements';
-import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/AntDesign';
+// import { useNavigation } from '@react-navigation/native';
 import globalStyles from './styles';
 import Header from '../../components/common/header';
 import { ProductContext } from '../../store/ProductContext';
@@ -26,7 +26,7 @@ const SearchScreen = ({ navigation }) => {
         <View style={styles.body}>
             {/* <Text style={[globalStyles.defaultText, styles.title]}>Пошук</Text> */}
               <View style={styles.searchContainer}>
-              {!isFocused && !searchQuery && <Icon name="search" size={20} style={styles.icon} />}
+              {!isFocused && !searchQuery && <Icon name="search1" size={20} style={styles.icon} />}
                 <TextInput
                 style={[globalStyles.defaultText, styles.searchInput]}
                 placeholder=" "

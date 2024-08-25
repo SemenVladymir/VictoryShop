@@ -13,7 +13,8 @@ export const logAsyncStorage = async () => {
 // Сохранение массива в AsyncStorage
 export const saveData = async (key, data) => {
   try {
-    await AsyncStorage.setItem(key, JSON.stringify(data));
+    if (key && data)
+      await AsyncStorage.setItem(key, JSON.stringify(data));
   } catch (e) {
     console.error(e);
   }
@@ -43,10 +44,12 @@ export const getDataString = async (key) => {
 // Добавление нового data в массив
 export const addNewData = async (key, newData) => {
   try {
-    const data = await getData(key);
-    if (!data.includes(newData)) {
-      data.push(newData);
-      await saveData(key, data);
+    if (key && newData) {
+      const data = await getData(key);
+      if (!data.includes(newData)) {
+        data.push(newData);
+        await saveData(key, data);
+      }
     }
   } catch (e) {
     console.error(e);
@@ -56,9 +59,11 @@ export const addNewData = async (key, newData) => {
 // Удаление ID из массива
 export const removeDataItemById = async (key, dataItemId) => {
   try {
-    let data = await getData(key);
-    data = data.filter(id => id !== dataItemId);
-    await saveData(key, data);
+    if (key && dataItemId) {
+      let data = await getData(key);
+      data = data.filter(id => id !== dataItemId);
+      await saveData(key, data);
+    }
   } catch (e) {
     console.error(e);
   }
@@ -67,7 +72,8 @@ export const removeDataItemById = async (key, dataItemId) => {
 //Очистка данных из AsyncStorage
 export const clearData = async (key) => {
   try {
-    const data = await AsyncStorage.removeItem(key);
+    if (key)
+      await AsyncStorage.removeItem(key);
   } catch (e) {
     console.error(e);
   }

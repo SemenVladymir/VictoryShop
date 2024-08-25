@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }) => {
 
   const loadToken = async () => {
     const date = await getDataString('RefreshTokenEndDate');
-    if (parseInt(date, 10) < Date.now())
+    if (date && parseInt(date, 10) < Date.now())
     {
       try
       {

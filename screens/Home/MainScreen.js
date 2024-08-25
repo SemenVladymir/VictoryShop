@@ -1,48 +1,85 @@
 // pages/HomePage.js
-import React from 'react';
-import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
+import React, { useContext } from 'react';
+import { View, Text, StyleSheet, Image, Pressable, SafeAreaView, ScrollView } from 'react-native';
 import Header from '../../components/common/header';
 import globalStyles from '../Other/styles';
 import { useNavigation } from '@react-navigation/native';
-//import Footer from './footer';
+import Product from '../../components/Product/Product';
+import { ProductContext } from '../../store/ProductContext';
 
 const Main = () => {
   const navigation = useNavigation();
+  const { products, discounts } = useContext(ProductContext);
+  function filterProductsByCategory(cathegoryId) {
+    return products.filter(product => {
+      const discount = discounts.find(d => d.id === product.discountId);
+      return discount && discount.percent > 0 && product.cathegoryId === cathegoryId;
+    });
+  }
 
   return (
-    <View style={styles.container}>
-      <Header cartCount={2} onlyLOGO={false}/>
-      <View style={styles.body}>
+    <SafeAreaView style={styles.container}>
+      <Header />
+      <ScrollView contentContainerStyle={styles.scrollViewContent}>
+        <View style={styles.body}>
           <Image source={require('../../assets/images/img2.png')} style={styles.image} />
-        <Text style={[globalStyles.boldText, styles.bodyText1]}>{`Твоя перемога ближче,\n ніж здається!`}</Text>
-        <Text style={[globalStyles.defaultText, styles.bodyText2]}>{`Знижка до 70%\n на весь асортимент спортивних товарів!`}</Text>
+          <Text style={[globalStyles.boldText, styles.bodyText1]}>{`Твоя перемога ближче,\n ніж здається!`}</Text>
+          <Text style={[globalStyles.defaultText, styles.bodyText2]}>{`Знижка до 70%\n на весь асортимент спортивних товарів!`}</Text>
+          
+          <Pressable style={styles.button} onPress={() => navigation.navigate('Catalog')}>
+            <Text style={[globalStyles.defaultText, styles.buttonText]}>До покупок</Text>
+          </Pressable>
+        </View>
         
-        <Pressable style={styles.button} onPress={() => navigation.navigate('Catalog')}>
-          <Text style={[globalStyles.defaultText, styles.buttonText]}>До покупок</Text>
-        </Pressable>
-      </View>
-      {/* <Footer /> */}
-    </View>
+        <View style={styles.promotionsSection}>
+          <Text style={[globalStyles.boldText, styles.promotionsTitle]}>Акційні товари</Text>
+          <Text style={[globalStyles.boldText, styles.promotionsTitleOther]}>Одяг</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.horizontalScrollView}>
+            {filterProductsByCategory(2).map((item, index) => (
+              <Pressable key={index} onPress={() => navigation.navigate('ProductPage', {product: item })}>
+                <Product item={item} />
+              </Pressable>
+            ))}
+          </ScrollView>
+
+          <Text style={[globalStyles.boldText, styles.promotionsTitleOther]}>Взуття</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.horizontalScrollView}>
+            {filterProductsByCategory(3).map((item, index) => (
+              <Pressable key={index} onPress={() => navigation.navigate('ProductPage', {product: item })}>
+                <Product item={item} />
+              </Pressable>
+            ))}
+          </ScrollView>
+
+          <Text style={[globalStyles.boldText, styles.promotionsTitleOther]}>Аксесуари</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.horizontalScrollView}>
+            {filterProductsByCategory(4).map((item, index) => (
+              <Pressable key={index} onPress={() => navigation.navigate('ProductPage', {product: item })}>
+                <Product item={item} />
+              </Pressable>
+            ))}
+          </ScrollView>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'flex-start',
-    //alignItems: 'center',
+    backgroundColor: '#FFFFFF',
   },
   image: {
     width: '100%',
-    height: '60%',
+    height: 390,
     resizeMode: 'contain',
     marginBottom: 15,
   },
   body: {
-    flex: 1,
     alignItems: 'center',
     justifyContent: 'flex-start',
-    backgroundColor: '#FFFFFF',
+    paddingBottom: 30,
   },
   bodyText1: {
     textAlign: 'center',
@@ -51,17 +88,15 @@ const styles = StyleSheet.create({
   bodyText2: {
     marginTop: 10,
     textAlign: 'center',
-    fontWeight: 400,
+    fontWeight: '400',
     fontSize: 14,
   },
   button: {
     marginTop: 20,
     backgroundColor: '#4748FF',
-    alignItems: 'center',
-    justifyContent: 'center',
     borderRadius: 25,
     paddingVertical: 15,
-    alignItems: 'center',
+    paddingHorizontal: 30,
     shadowColor: '#000',
     shadowOffset: {
       width: 3,
@@ -70,12 +105,30 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.4,
     shadowRadius: 5,
     elevation: 5,
-    width: 150,
   },
   buttonText: {
     color: '#FFF',
     fontSize: 18,
     textAlign: 'center',
+  },
+  scrollViewContent: {
+    paddingBottom: 20,
+  },
+  promotionsSection: {
+    marginTop: 20,
+    paddingHorizontal: 20,
+  },
+  promotionsTitle: {
+    fontSize: 20,
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  promotionsTitleOther: {
+    fontSize: 18,
+    marginBottom: 10,
+  },
+  horizontalScrollView: {
+    flexDirection: 'row',
   },
 });
 

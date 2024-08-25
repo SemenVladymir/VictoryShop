@@ -135,8 +135,8 @@ const Profile = ({ navigation }) => {
       <Header/>
       <ScrollView style={styles.container}>
       <View style={styles.profileContainer}>
-        <Pressable onPress={showImagePickerOptions}>
-            {imageUri ? <Image source={{ uri: imageUri }} style={styles.profileImage} />
+        <Pressable onPress={showImagePickerOptions} style={styles.imageContainer}>
+            {imageUri ? <Image source={{ uri: imageUri }} style={[styles.profileImage, styles.shadow]} />
               :
             <Image source={require('../../assets/images/No_Image.jpg')} style={styles.profileImage} />}
           <Text style={[globalStyles.defaultText, styles.changePhotoText]}>Змінити фото</Text>
@@ -203,7 +203,7 @@ const Profile = ({ navigation }) => {
             <Icon name="edit" size={20} color="#000" backgroundColor='#F5F5F5'/>
           </View>
         </View>
-        <Pressable style={styles.button} onPress={() => handleSaveProfile()}>
+        <Pressable style={[styles.button, styles.shadow]} onPress={() => handleSaveProfile()}>
           <Text style={[globalStyles.defaultText, styles.buttonText]}>Зберегти</Text>
         </Pressable>
       </View>
@@ -221,6 +221,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginVertical: 20,
   },
+  imageContainer: {
+    width: 102,
+    height: 102,
+    borderRadius: 51,
+    backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: { width: 3, height: 3 },
+    shadowOpacity: 0.6,
+    shadowRadius: 10,
+    elevation: 15,
+    marginBottom: 10,
+  },
   profileImage: {
     width: 100,
     height: 100,
@@ -235,6 +247,9 @@ const styles = StyleSheet.create({
   inputContainer: {
     width: '80%',
     marginVertical: 10,
+  },
+  text: {
+    fontSize: 16,
   },
   input: {
     padding: 5,
@@ -263,6 +278,14 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingVertical: 10,
     alignItems: 'center',
+    width: 150,
+  },
+  buttonText: {
+    color: '#FFF',
+    fontSize: 16,
+  },
+  label: {},
+  shadow: {
     shadowColor: '#000',
     shadowOffset: {
       width: 3,
@@ -271,13 +294,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.4,
     shadowRadius: 5,
     elevation: 5,
-    width: 150,
   },
-  buttonText: {
-    color: '#FFF',
-    fontSize: 16,
-  },
-  label: {},
 });
 
 export default Profile;
